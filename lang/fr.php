@@ -1,0 +1,197 @@
+<?php
+
+$lang->zittme_pay = 'Zittme Pay';
+
+// Onglets d'administration
+$lang->zpay_tab_config = 'Général';
+$lang->zpay_tab_gateway = 'Moyens de paiement';
+$lang->zpay_tab_orders = 'Paiements';
+$lang->zpay_tab_logs = 'Journal des échanges';
+
+$lang->about_zpay_config = 'Comportement commun du moteur de paiement. Les modules qui ont besoin de paiement, comme la boutique ou la réservation, partagent ces réglages.';
+$lang->about_zpay_gateway = 'Activez les moyens de paiement souhaités et saisissez leurs clés. Un moyen sans clé n\'apparaît jamais sur la page de paiement.';
+$lang->about_zpay_logs = 'Toutes les requêtes et réponses échangées pour un paiement. C\'est votre preuve en cas de litige : conservez-les suffisamment longtemps.';
+
+// Noms des moyens de paiement
+$lang->gateway_toss = 'Toss Payments';
+$lang->gateway_banktransfer = 'Virement bancaire';
+
+// Général
+$lang->zpay_enabled = 'Activer les paiements';
+$lang->zpay_enabled_help = 'Désactivez pour ne plus accepter de nouveaux paiements.';
+$lang->zpay_test_mode = 'Mode test';
+$lang->zpay_test_mode_help = 'Indique que les clés de test du prestataire sont utilisées. Aucun argent réel ne circule.';
+$lang->zpay_currency = 'Devise';
+$lang->zpay_order_prefix = 'Préfixe du numéro de commande';
+$lang->zpay_order_prefix_help = 'Permet de reconnaître vos commandes dans la console du prestataire. Lettres et chiffres, 8 caractères maximum.';
+
+$lang->zpay_group_cancel = 'Annulation et remboursement';
+$lang->zpay_allow_partial_cancel = 'Autoriser l\'annulation partielle';
+$lang->zpay_allow_partial_cancel_help = 'Permet de rembourser seulement une partie du montant payé.';
+$lang->zpay_cancel_reasons = 'Motifs d\'annulation';
+$lang->zpay_cancel_reasons_help = 'Un par ligne. Laissez vide pour saisir le motif à chaque fois.';
+
+$lang->zpay_group_notify = 'Notifications';
+$lang->zpay_notify_admin_email = 'Courriel de l\'administration';
+$lang->zpay_notify_events = 'Me notifier lorsque';
+$lang->zpay_notify_on_paid = 'Un paiement aboutit';
+$lang->zpay_notify_on_cancel = 'Un paiement est annulé';
+
+$lang->zpay_group_security = 'Sécurité et journalisation';
+$lang->zpay_log_retention_days = 'Conservation du journal (jours)';
+$lang->zpay_log_retention_days_help = '0 conserve indéfiniment. Ne réglez pas trop bas : ce journal est votre preuve en cas de litige.';
+$lang->zpay_webhook_ip_whitelist = 'IP autorisées pour les webhooks';
+$lang->zpay_webhook_ip_whitelist_help = 'Une par ligne. Laissez vide pour tout autoriser. Terminez par * pour couvrir une plage. Le filtrage par IP n\'est qu\'une mesure secondaire ; la vraie défense est de réinterroger le prestataire à chaque webhook.';
+
+$lang->zpay_group_notice = 'Mentions légales';
+$lang->zpay_biz_notice = 'Mention en bas de la page de paiement';
+$lang->zpay_biz_notice_help = 'Numéro d\'immatriculation et mentions similaires affichés en bas de la page de paiement.';
+
+// Moyens de paiement
+$lang->zpay_enabled_gateways = 'Moyens de paiement actifs';
+$lang->zpay_enabled_gateways_help = 'Seuls les moyens cochés apparaissent sur la page de paiement.';
+$lang->zpay_not_configured = 'clés manquantes';
+$lang->zpay_toss_client_key = 'Clé client';
+$lang->zpay_toss_secret_key = 'Clé secrète';
+$lang->zpay_toss_key_help = 'Délivrée dans la console marchand de Toss Payments. Les clés de test commencent par test_ et les clés de production par live_.';
+$lang->zpay_webhook_url = 'Adresse du webhook';
+$lang->zpay_webhook_url_help = 'Enregistrez cette adresse dans la console de votre prestataire afin de recevoir les notifications asynchrones, comme les virements sur compte virtuel.';
+$lang->zpay_bank_accounts = 'Comptes bancaires';
+$lang->zpay_bank_accounts_help = 'Seules les lignes comportant une banque et un numéro de compte sont enregistrées. Videz une ligne pour la supprimer.';
+$lang->zpay_bank_name = 'Banque';
+$lang->zpay_bank_account = 'Numéro de compte';
+$lang->zpay_bank_holder = 'Titulaire';
+$lang->zpay_bank_due_days = 'Délai de paiement (jours)';
+$lang->zpay_bank_due_days_help = 'Passé ce délai, la commande expire.';
+
+// Paiement
+$lang->zpay_checkout_title = 'Paiement';
+$lang->zpay_order_summary = 'Récapitulatif';
+$lang->zpay_order_code = 'Numéro de commande';
+$lang->zpay_product = 'Article';
+$lang->zpay_payer = 'Payeur';
+$lang->zpay_payer_phone = 'Téléphone';
+$lang->zpay_payer_email = 'Courriel';
+$lang->zpay_amount = 'Montant';
+$lang->zpay_select_method = 'Choisissez un moyen de paiement';
+$lang->zpay_depositor_name = 'Nom du donneur d\'ordre';
+$lang->zpay_bank_due_notice = 'Merci d\'effectuer le virement sous %d jours. Passé ce délai, la commande est annulée automatiquement.';
+$lang->zpay_pay_button = 'Payer %s';
+
+// Résultat
+$lang->zpay_result_paid = 'Paiement effectué';
+$lang->zpay_result_pending = 'En attente de votre virement';
+$lang->zpay_result_cancelled = 'Paiement annulé';
+$lang->zpay_result_expired = 'Le délai de paiement est dépassé';
+$lang->zpay_result_failed = 'Le paiement a échoué';
+$lang->zpay_bank_guide_title = 'Coordonnées bancaires';
+$lang->zpay_due_date = 'À payer avant le';
+$lang->zpay_receipt = 'Voir le reçu';
+$lang->zpay_back_to_shop = 'Retour';
+$lang->zpay_cancelled_amount = 'Montant annulé';
+
+// Liste
+$lang->zpay_order_detail = 'Détail du paiement';
+$lang->zpay_source = 'Objet du paiement';
+$lang->zpay_gateway = 'Moyen';
+$lang->zpay_pg_tid = 'Identifiant de transaction';
+$lang->zpay_status = 'Statut';
+$lang->zpay_regdate = 'Créé le';
+$lang->zpay_paid_date = 'Payé le';
+$lang->zpay_cancelled_date = 'Annulé le';
+$lang->zpay_ipaddress = 'Adresse IP';
+$lang->zpay_remain_amount = 'restant';
+$lang->zpay_total_orders = '%s paiements';
+$lang->zpay_no_orders = 'Aucun paiement pour le moment.';
+$lang->zpay_filter_all_status = 'Tous les statuts';
+$lang->zpay_confirm_deposit = 'Confirmer la réception';
+$lang->zpay_confirm_deposit_help = 'Cliquez une fois que vous avez constaté l\'arrivée des fonds. Le paiement est aussitôt considéré comme abouti et le module demandeur est notifié.';
+$lang->zpay_cancel_payment = 'Annuler le paiement';
+$lang->zpay_cancel_amount = 'Montant à annuler';
+$lang->zpay_cancel_amount_help = 'Vous ne pouvez pas annuler plus que le montant restant.';
+$lang->zpay_cancel_reason = 'Motif';
+
+// Statuts
+$lang->zpay_status_ready = 'En attente de paiement';
+$lang->zpay_status_pending = 'En attente de réception';
+$lang->zpay_status_paid = 'Payé';
+$lang->zpay_status_cancelled = 'Annulé';
+$lang->zpay_status_partial_cancelled = 'Partiellement annulé';
+$lang->zpay_status_failed = 'Échoué';
+$lang->zpay_status_expired = 'Expiré';
+
+// Journal
+$lang->zpay_communication_log = 'Journal des échanges';
+$lang->zpay_log_action = 'Action';
+$lang->zpay_log_result = 'Résultat';
+$lang->zpay_log_response = 'Réponse';
+$lang->zpay_no_logs = 'Aucun enregistrement.';
+$lang->zpay_total_logs = '%s enregistrements';
+$lang->zpay_filter_all_action = 'Toutes les actions';
+$lang->zpay_filter_all_result = 'Tous les résultats';
+$lang->zpay_result_success = 'Succès';
+$lang->zpay_result_fail = 'Échec';
+$lang->zpay_purge_logs = 'Supprimer les enregistrements de plus de %d jours';
+
+// Messages
+$lang->msg_pay_disabled = 'Les paiements sont désactivés.';
+$lang->msg_invalid_source = 'L\'objet du paiement est invalide.';
+$lang->msg_invalid_amount = 'Le montant du paiement est invalide.';
+$lang->msg_order_not_found = 'Commande de paiement introuvable.';
+$lang->msg_no_gateway_available = 'Aucun moyen de paiement disponible. Merci de contacter l\'administration du site.';
+$lang->msg_gateway_not_found = 'Moyen de paiement introuvable.';
+$lang->msg_invalid_ticket = 'Cette session de paiement a expiré. Merci de recommencer.';
+$lang->msg_already_settled = 'Ce paiement a déjà été traité.';
+$lang->msg_too_many_requests = 'Trop de tentatives de paiement. Merci de réessayer dans un instant.';
+
+$lang->msg_approve_success = 'Le paiement a été validé.';
+$lang->msg_approve_failed = 'Le paiement n\'a pas pu être validé.';
+$lang->msg_payment_cancelled = 'Le paiement a été annulé.';
+$lang->msg_payment_not_completed = 'Ce paiement n\'a pas abouti.';
+$lang->msg_amount_mismatch = 'Le paiement a été interrompu car le montant ne correspond pas à la commande.';
+$lang->msg_missing_payment_key = 'L\'identifiant de transaction est absent.';
+$lang->msg_unknown_pg_status = 'Statut de paiement inconnu.';
+$lang->msg_pg_error = 'Le prestataire de paiement a renvoyé une erreur.';
+$lang->msg_pg_unreachable = 'Impossible de joindre le prestataire de paiement.';
+$lang->msg_query_not_supported = 'Ce moyen de paiement ne permet pas la consultation.';
+
+$lang->msg_cancel_success = 'Le paiement a été annulé.';
+$lang->msg_cancel_failed = 'Le paiement n\'a pas pu être annulé.';
+$lang->msg_not_cancellable = 'Ce paiement ne peut pas être annulé dans son état actuel.';
+$lang->msg_invalid_cancel_amount = 'Le montant d\'annulation est invalide.';
+$lang->msg_partial_cancel_disabled = 'L\'annulation partielle n\'est pas autorisée.';
+$lang->msg_cancel_record_failed = 'Le prestataire a bien annulé le paiement, mais son enregistrement ici a échoué. Merci de contacter l\'administration du site.';
+$lang->cancel_default_reason = 'Demande du client';
+
+$lang->msg_no_bank_account = 'Aucun compte bancaire n\'est enregistré.';
+$lang->msg_bank_registered = 'Les coordonnées bancaires sont affichées ci-dessous. Merci de virer le montant dans les délais.';
+$lang->msg_bank_manual_refund = 'Les remboursements par virement doivent être effectués manuellement par l\'administration.';
+$lang->msg_not_pending = 'Cette commande n\'est pas en attente de réception.';
+$lang->msg_deposit_confirmed = 'La réception a été confirmée et le paiement est désormais abouti.';
+$lang->msg_log_retention_disabled = 'La conservation est réglée sur 0 : rien n\'est supprimé.';
+
+// Confirmation d'achat et remboursement manuel
+$lang->zpay_status_confirmed = 'Confirmé';
+$lang->zpay_confirm_date = 'Date de confirmation';
+$lang->zpay_auto_cancel_days = 'Délai d\'annulation chez le prestataire (jours)';
+$lang->zpay_auto_cancel_days_help = 'Passé ce délai, aucune annulation n\'est tentée chez le prestataire et un remboursement manuel est mis en attente, car l\'annulation par carte est bloquée une fois le paiement reversé. 0 signifie sans limite.';
+$lang->zpay_allow_force_cancel = 'Autoriser l\'annulation forcée';
+$lang->zpay_allow_force_cancel_help = 'Permet à l\'administration d\'annuler un paiement déjà confirmé. Désactivez pour rendre la confirmation définitive.';
+$lang->zpay_force_cancel = 'Annulation forcée';
+$lang->zpay_force_cancel_confirm = 'Je comprends que ce paiement est confirmé et souhaite l\'annuler quand même';
+$lang->zpay_force_cancel_help = 'Ce paiement est déjà confirmé. Pour l\'annuler, vous devez choisir explicitement l\'annulation forcée ci-dessous.';
+$lang->zpay_no_auto_cancel_help = 'Ce moyen de paiement ne peut pas être annulé automatiquement. L\'annulation ne met à jour que les enregistrements : l\'administration doit envoyer l\'argent manuellement.';
+$lang->zpay_manual_refund_title = 'Remboursement manuel';
+$lang->zpay_manual_refund_help = 'L\'annulation est enregistrée mais l\'argent n\'a pas encore été envoyé. Virez le montant ci-dessous puis marquez-le comme envoyé.';
+$lang->zpay_manual_refund_done = 'Marquer comme envoyé';
+$lang->zpay_manual_refund_sent = 'Remboursement envoyé';
+$lang->zpay_pending_refund_notice = '%s remboursement(s) n\'ont pas été envoyés. Merci de les vérifier.';
+
+$lang->msg_confirm_success = 'L\'achat a été confirmé.';
+$lang->msg_already_confirmed = 'Ce paiement était déjà confirmé.';
+$lang->msg_not_confirmable = 'Ce paiement ne peut pas être confirmé dans son état actuel.';
+$lang->msg_confirmed_not_cancellable = 'Un paiement confirmé ne peut pas être annulé. Une annulation forcée par l\'administration est nécessaire.';
+$lang->msg_force_cancel_disabled = 'L\'annulation forcée des paiements confirmés n\'est pas autorisée.';
+$lang->msg_cancel_manual_refund_queued = 'Annulé. Ce moyen de paiement ne permet pas le remboursement automatique : l\'administration doit envoyer l\'argent manuellement.';
+$lang->msg_no_pending_refund = 'Aucun remboursement en attente d\'envoi.';
+$lang->msg_refund_completed = 'Enregistré comme envoyé.';

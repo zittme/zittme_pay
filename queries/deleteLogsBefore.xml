@@ -1,0 +1,12 @@
+<query id="deleteLogsBefore" action="delete">
+	<!--
+	  보관기간이 지난 통신 로그를 지운다. 관리자가 보관기간을 0 으로 두면 호출하지 않는다.
+	  분쟁 대응 자료이므로 기본 보관기간은 넉넉히 잡는다.
+	-->
+	<tables>
+		<table name="zittme_pay_log" />
+	</tables>
+	<conditions>
+		<condition operation="below" column="regdate" var="regdate" required="true" />
+	</conditions>
+</query>

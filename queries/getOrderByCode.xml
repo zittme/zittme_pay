@@ -1,0 +1,14 @@
+<query id="getOrderByCode" action="select">
+	<!--
+	  결제 화면과 PG 콜백이 주문을 찾는 통로. order_code 는 unique 이므로 언제나 0 또는 1건이다.
+	-->
+	<tables>
+		<table name="zittme_pay_order" />
+	</tables>
+	<columns>
+		<column name="*" />
+	</columns>
+	<conditions>
+		<condition operation="equal" column="order_code" var="order_code" required="true" />
+	</conditions>
+</query>

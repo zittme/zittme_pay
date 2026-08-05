@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+
+	<!--
+	  grant 를 두지 않는다.
+
+	  결제 화면에 들어오는 열쇠는 추측할 수 없는 order_code 이고, 그 주소는 요청자 모듈이
+	  자기 권한 검사를 통과한 사람에게만 건네준다. 즉 접근 통제는 이미 요청자 쪽에서 끝나 있다.
+	  여기에 쓰지도 않을 grant 를 선언해 두면 관리자가 "결제 권한을 조였다" 고 믿게 되지만
+	  실제로는 아무것도 막지 않는, 사실과 다른 화면이 된다.
+
+	  관리자 액션은 grant 대신 permission="manager" 로 코어가 직접 막는다.
+	-->
+
+	<actions>
+		<!--
+		  결제 화면은 요청자 모듈(커머스·예약)이 발급한 결제 URL 로 바로 열린다.
+		  그 URL 에는 mid 가 없으므로 standalone="true" 로 둔다. (pitfall #52 — standalone 값과
+		  링크의 mid 포함 여부는 항상 짝을 맞춘다.)
+		-->
+		<action name="dispZittme_payCheckout" class="Controllers\Pay" standalone="true" />
+		<action name="dispZittme_payResult" class="Controllers\Pay" standalone="true" />
+		<action name="procZittme_payReady" class="Controllers\Pay" standalone="true" />
+
+		<!--
+		  ★ 세션 금지 구역.
+		  PG 가 크로스사이트로 POST 하므로 SameSite 세션쿠키가 오지 않는다. 세션을 건드리면
+		  PHP 가 새 세션을 발급해 원래 창의 CSRF 토큰이 무효화된다 (pitfall #57).
+		  그래서 check-csrf="false" 로 코어 검사를 끄고, state 티켓과 금액 대조로 자체 검증한다.
+		  ⚠️ 속성 이름은 check-csrf (하이픈) 다. check_csrf 로 적으면 파서가 무시해서
+		     CSRF 검사가 그대로 켜진 채 콜백이 막힌다.
+		-->
+		<action name="procZittme_payCallback" class="Controllers\Pay" standalone="true" check-csrf="false" />
+		<action name="procZittme_payWebhook" class="Controllers\Pay" standalone="true" check-csrf="false" />
+
+		<!-- 관리자 -->
+		<action name="dispZittme_payAdminConfig" class="Controllers\Admin" admin-index="true" menu-name="zittme_pay" menu-index="true" permission="manager" />
+		<action name="dispZittme_payAdminGateway" class="Controllers\Admin" menu-name="zittme_pay" permission="manager" />
+		<action name="dispZittme_payAdminOrders" class="Controllers\Admin" menu-name="zittme_pay" permission="manager" />
+		<action name="dispZittme_payAdminOrderView" class="Controllers\Admin" permission="manager" />
+		<action name="dispZittme_payAdminLogs" class="Controllers\Admin" menu-name="zittme_pay" permission="manager" />
+
+		<action name="procZittme_payAdminInsertConfig" class="Controllers\Admin" permission="manager" />
+		<action name="procZittme_payCancel" class="Controllers\Admin" permission="manager" />
+		<action name="procZittme_payAdminConfirmDeposit" class="Controllers\Admin" permission="manager" />
+		<action name="procZittme_payAdminCompleteRefund" class="Controllers\Admin" permission="manager" />
+		<action name="procZittme_payAdminPurgeLogs" class="Controllers\Admin" permission="manager" />
+	</actions>
+
+	<classes>
+		<class type="default" name="Controllers\Base" />
+		<class type="install" name="Controllers\Install" />
+	</classes>
+
+	<menus>
+		<menu name="zittme_pay" type="all">
+			<title xml:lang="ko">짓미 페이</title>
+			<title xml:lang="en">Zittme Pay</title>
+		</menu>
+	</menus>
+
+</module>

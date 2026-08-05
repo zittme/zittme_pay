@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module version="0.2">
+	<title xml:lang="ko">짓미 페이</title>
+	<title xml:lang="en">Zittme Pay</title>
+	<title xml:lang="ja">짓미ペイ</title>
+	<title xml:lang="zh-CN">Zittme 支付</title>
+	<title xml:lang="zh-TW">Zittme 支付</title>
+	<title xml:lang="vi">Zittme Pay</title>
+	<title xml:lang="mn">Zittme Pay</title>
+	<title xml:lang="ru">Zittme Pay</title>
+	<title xml:lang="es">Zittme Pay</title>
+	<title xml:lang="fr">Zittme Pay</title>
+	<title xml:lang="de">Zittme Pay</title>
+	<title xml:lang="tr">Zittme Pay</title>
+	<description xml:lang="ko">결제가 필요한 모듈이 공용으로 쓰는 결제 엔진입니다. 커머스·예약 등 요청자 모듈이 주문을 등록하면 결제창 호출부터 서버 승인, 취소·환불까지 대신 처리합니다. 요청자 모듈은 PG 를 알 필요가 없습니다.</description>
+	<description xml:lang="en">A shared payment engine. Requesting modules such as commerce or reservation register an order, and this module handles the payment window, server-side approval, cancellation and refunds. Requesters never touch a payment gateway directly.</description>
+	<description xml:lang="ja">決済を必要とするモジュールが共通で使う決済エンジンです。コマース・予約などのリクエスト元が注文を登録すると、決済画面の呼び出しからサーバー承認、キャンセル・返金までを代行します。</description>
+	<description xml:lang="zh-CN">供各模块共用的支付引擎。商城、预约等请求方模块登记订单后，由本模块负责调起支付、服务器端确认以及取消与退款。</description>
+	<description xml:lang="zh-TW">供各模組共用的支付引擎。商城、預約等請求方模組登記訂單後，由本模組負責調起支付、伺服器端確認以及取消與退款。</description>
+	<description xml:lang="vi">Công cụ thanh toán dùng chung. Các module yêu cầu như thương mại hoặc đặt chỗ đăng ký đơn hàng, module này lo phần gọi cổng thanh toán, xác nhận phía máy chủ, hủy và hoàn tiền.</description>
+	<description xml:lang="mn">Төлбөр шаардлагатай модулиуд хамтран ашиглах төлбөрийн систем. Худалдаа, захиалга зэрэг модулиуд захиалга бүртгэхэд төлбөрийн цонх дуудах, сервер талын баталгаажуулалт, цуцлалт, буцаалтыг хариуцна.</description>
+	<description xml:lang="ru">Общий платёжный движок. Модули-заказчики (магазин, бронирование) регистрируют заказ, а этот модуль вызывает платёжное окно, подтверждает оплату на сервере и выполняет отмену и возврат.</description>
+	<description xml:lang="es">Motor de pagos compartido. Los módulos solicitantes, como comercio o reservas, registran un pedido y este módulo se encarga de la ventana de pago, la aprobación en el servidor y las cancelaciones y reembolsos.</description>
+	<description xml:lang="fr">Moteur de paiement partagé. Les modules demandeurs (boutique, réservation) enregistrent une commande et ce module gère la fenêtre de paiement, la validation côté serveur, les annulations et les remboursements.</description>
+	<description xml:lang="de">Gemeinsame Zahlungs-Engine. Anfragende Module wie Shop oder Reservierung legen eine Bestellung an; dieses Modul übernimmt Zahlungsfenster, serverseitige Freigabe sowie Stornierung und Rückerstattung.</description>
+	<description xml:lang="tr">Ortak kullanılan ödeme motoru. Ticaret veya rezervasyon gibi talep eden modüller bir sipariş kaydeder; ödeme penceresi, sunucu tarafı onay, iptal ve iade işlemlerini bu modül yürütür.</description>
+	<version>0.1.0</version>
+	<date>2026-07-29</date>
+	<category>service</category>
+	<author email_address="contact@zittme.com" link="https://zitt.me">
+		<name xml:lang="ko">ZZAN Studio</name>
+		<name xml:lang="en">ZZAN Studio</name>
+	</author>
+</module>

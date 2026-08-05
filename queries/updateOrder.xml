@@ -1,0 +1,26 @@
+<query id="updateOrder" action="update">
+	<!--
+	  값이 넘어온 칼럼만 바뀐다. 코어 쿼리 파서가 변수 없는 칼럼의 SET 절을 통째로 빼기 때문이다.
+	  그래서 "바꾸고 싶은 것만" 담아 부르면 된다.
+
+	  ⚠️ amount 는 여기에 없다. 승인 대조의 기준 금액이라 주문 생성 뒤에는 절대 바뀌면 안 된다.
+	     상태 전이는 이 쿼리가 아니라 updateOrderStatusIf 로 한다 (멱등성).
+	-->
+	<tables>
+		<table name="zittme_pay_order" />
+	</tables>
+	<columns>
+		<column name="payer_name" var="payer_name" />
+		<column name="payer_phone" var="payer_phone" />
+		<column name="payer_email" var="payer_email" />
+		<column name="gateway" var="gateway" />
+		<column name="pay_method" var="pay_method" />
+		<column name="pg_tid" var="pg_tid" />
+		<column name="return_url" var="return_url" />
+		<column name="extra_vars" var="extra_vars" />
+		<column name="due_date" var="due_date" />
+	</columns>
+	<conditions>
+		<condition operation="equal" column="order_srl" var="order_srl" required="true" />
+	</conditions>
+</query>

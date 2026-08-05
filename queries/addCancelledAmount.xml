@@ -1,0 +1,24 @@
+<query id="addCancelledAmount" action="update">
+	<!--
+	  부분취소 누적. cancelled_amount 를 PHP 에서 더해 넣지 않고 DB 안에서 더한다
+	  (operation="plus"). 취소 요청이 연달아 들어와도 누적이 어긋나지 않는다.
+
+	  조건의 cancelled_amount <= max_cancellable 가 초과 환불 방지선이다.
+	  (max_cancellable = amount - 이번에 취소할 금액) 이 조건 덕분에 남은 금액보다 큰 취소는
+	  affected_rows 0 으로 떨어져 실패한다.
+	-->
+	<tables>
+		<table name="zittme_pay_order" />
+	</tables>
+	<columns>
+		<column name="cancelled_amount" var="cancel_amount" operation="plus" notnull="notnull" />
+		<column name="status" var="status" notnull="notnull" />
+		<column name="cancelled_date" var="cancelled_date" />
+		<column name="extra_vars" var="extra_vars" />
+	</columns>
+	<conditions>
+		<condition operation="equal" column="order_srl" var="order_srl" required="true" />
+		<condition operation="in" column="status" var="from_status_list" pipe="and" required="true" />
+		<condition operation="less" column="cancelled_amount" var="max_cancellable" pipe="and" required="true" />
+	</conditions>
+</query>

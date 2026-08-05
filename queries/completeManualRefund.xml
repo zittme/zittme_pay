@@ -1,0 +1,19 @@
+<query id="completeManualRefund" action="update">
+	<!--
+	  관리자가 실제로 송금한 뒤의 완료 처리.
+
+	  "지금 pending 일 때만" 완료로 옮긴다. 두 관리자가 동시에 눌러도 한 번만 통과하며,
+	  호출부는 DB::getAffectedRows() 로 판정한다. 이미 처리된 건을 또 완료로 만들지 않는다.
+	-->
+	<tables>
+		<table name="zittme_pay_order" />
+	</tables>
+	<columns>
+		<column name="refund_state" var="refund_state" notnull="notnull" />
+		<column name="refund_date" var="refund_date" />
+	</columns>
+	<conditions>
+		<condition operation="equal" column="order_srl" var="order_srl" required="true" />
+		<condition operation="equal" column="refund_state" var="from_refund_state" pipe="and" required="true" />
+	</conditions>
+</query>

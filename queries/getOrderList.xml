@@ -1,0 +1,34 @@
+<query id="getOrderList" action="select">
+	<!-- 관리자 결제내역 화면. -->
+	<tables>
+		<table name="zittme_pay_order" />
+	</tables>
+	<columns>
+		<column name="*" />
+	</columns>
+	<conditions>
+		<condition operation="equal" column="status" var="status" />
+		<condition operation="in" column="status" var="status_list" pipe="and" />
+		<condition operation="equal" column="gateway" var="gateway" pipe="and" />
+		<condition operation="equal" column="source_module" var="source_module" pipe="and" />
+		<condition operation="equal" column="member_srl" var="member_srl" pipe="and" />
+		<!-- 송금 대기 목록을 뽑을 때 쓴다. -->
+		<condition operation="equal" column="refund_state" var="refund_state" pipe="and" />
+		<condition operation="more" column="regdate" var="start_date" pipe="and" />
+		<condition operation="below" column="regdate" var="end_date" pipe="and" />
+		<group pipe="and">
+			<condition operation="like" column="order_code" var="s_order_code" />
+			<condition operation="like" column="payer_name" var="s_payer_name" pipe="or" />
+			<condition operation="like" column="payer_phone" var="s_payer_phone" pipe="or" />
+			<condition operation="like" column="payer_email" var="s_payer_email" pipe="or" />
+			<condition operation="like" column="pg_tid" var="s_pg_tid" pipe="or" />
+			<condition operation="like" column="title" var="s_title" pipe="or" />
+		</group>
+	</conditions>
+	<navigation>
+		<index var="sort_index" default="order_srl" order="desc" />
+		<list_count var="list_count" default="20" />
+		<page_count var="page_count" default="10" />
+		<page var="page" default="1" />
+	</navigation>
+</query>

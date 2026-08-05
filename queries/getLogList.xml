@@ -1,0 +1,23 @@
+<query id="getLogList" action="select">
+	<tables>
+		<table name="zittme_pay_log" />
+	</tables>
+	<columns>
+		<column name="*" />
+	</columns>
+	<conditions>
+		<condition operation="equal" column="order_srl" var="order_srl" />
+		<condition operation="equal" column="order_code" var="order_code" pipe="and" />
+		<condition operation="equal" column="gateway" var="gateway" pipe="and" />
+		<condition operation="equal" column="action" var="action" pipe="and" />
+		<condition operation="equal" column="result" var="result" pipe="and" />
+		<condition operation="more" column="regdate" var="start_date" pipe="and" />
+		<condition operation="below" column="regdate" var="end_date" pipe="and" />
+	</conditions>
+	<navigation>
+		<index var="sort_index" default="log_srl" order="desc" />
+		<list_count var="list_count" default="30" />
+		<page_count var="page_count" default="10" />
+		<page var="page" default="1" />
+	</navigation>
+</query>

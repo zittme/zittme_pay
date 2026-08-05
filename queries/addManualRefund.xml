@@ -1,0 +1,21 @@
+<query id="addManualRefund" action="update">
+	<!--
+	  수동 환불 대기 등록.
+
+	  부분취소가 여러 번 일어나면 송금해야 할 금액이 쌓인다. 그래서 PHP 에서 더해 넣지 않고
+	  DB 안에서 더한다(operation="plus"). 취소 요청이 연달아 들어와도 누적이 어긋나지 않는다.
+
+	  이미 done 인 건에 새 취소가 붙으면 다시 pending 으로 돌아간다 — 남은 송금이 생겼다는 뜻이므로
+	  조건 없이 상태를 덮는 것이 맞다.
+	-->
+	<tables>
+		<table name="zittme_pay_order" />
+	</tables>
+	<columns>
+		<column name="refund_amount" var="refund_amount" operation="plus" notnull="notnull" />
+		<column name="refund_state" var="refund_state" notnull="notnull" />
+	</columns>
+	<conditions>
+		<condition operation="equal" column="order_srl" var="order_srl" required="true" />
+	</conditions>
+</query>

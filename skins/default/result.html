@@ -1,0 +1,90 @@
+@version(2)
+
+{{-- 결제 결과. 상태 확정은 콜백에서 이미 끝났고 이 화면은 결과를 보여 주기만 한다. --}}
+
+<div class="zpay zpay-result" data-status="{{ $order->status }}">
+
+	<header class="zpay-head">
+		@if($order->status === 'paid')
+		<h1 class="zpay-title zpay-title-ok">{{ $lang->zpay_result_paid }}</h1>
+		@elseif($order->status === 'pending')
+		<h1 class="zpay-title zpay-title-wait">{{ $lang->zpay_result_pending }}</h1>
+		@elseif($order->status === 'cancelled' || $order->status === 'partial_cancelled')
+		<h1 class="zpay-title zpay-title-wait">{{ $lang->zpay_result_cancelled }}</h1>
+		@elseif($order->status === 'expired')
+		<h1 class="zpay-title zpay-title-fail">{{ $lang->zpay_result_expired }}</h1>
+		@else
+		<h1 class="zpay-title zpay-title-fail">{{ $lang->zpay_result_failed }}</h1>
+		@endif
+
+		@if($claim_message)
+		<p class="zpay-result-message">{{ $claim_message }}</p>
+		@endif
+	</header>
+
+	<section class="zpay-summary">
+		<dl class="zpay-summary-list">
+			<div class="zpay-summary-row">
+				<dt>{{ $lang->zpay_order_code }}</dt>
+				<dd>{{ $order->order_code }}</dd>
+			</div>
+			<div class="zpay-summary-row">
+				<dt>{{ $lang->zpay_product }}</dt>
+				<dd>{{ $order->title }}</dd>
+			</div>
+			<div class="zpay-summary-row zpay-summary-total">
+				<dt>{{ $lang->zpay_amount }}</dt>
+				<dd><strong>{{ number_format($order->amount) }}</strong> {{ $order->currency }}</dd>
+			</div>
+			@if($order->cancelled_amount > 0)
+			<div class="zpay-summary-row">
+				<dt>{{ $lang->zpay_cancelled_amount }}</dt>
+				<dd>{{ number_format($order->cancelled_amount) }} {{ $order->currency }}</dd>
+			</div>
+			@endif
+		</dl>
+	</section>
+
+	{{-- 무통장입금은 여기서부터가 본론이다. 어디로 얼마를 언제까지 넣어야 하는지 보여 준다. --}}
+	@if($order->status === 'pending' && $order->gateway === 'banktransfer')
+	<section class="zpay-bank-guide">
+		<h2 class="zpay-section-title">{{ $lang->zpay_bank_guide_title }}</h2>
+		<dl class="zpay-summary-list">
+			<div class="zpay-summary-row">
+				<dt>{{ $lang->zpay_bank_name }}</dt>
+				<dd>{{ $order->extra['bank'] ?? '' }}</dd>
+			</div>
+			<div class="zpay-summary-row">
+				<dt>{{ $lang->zpay_bank_account }}</dt>
+				<dd>{{ $order->extra['account'] ?? '' }}</dd>
+			</div>
+			<div class="zpay-summary-row">
+				<dt>{{ $lang->zpay_bank_holder }}</dt>
+				<dd>{{ $order->extra['holder'] ?? '' }}</dd>
+			</div>
+			<div class="zpay-summary-row">
+				<dt>{{ $lang->zpay_depositor_name }}</dt>
+				<dd>{{ $order->extra['depositor_name'] ?? '' }}</dd>
+			</div>
+			@if($order->due_date)
+			<div class="zpay-summary-row">
+				<dt>{{ $lang->zpay_due_date }}</dt>
+				<dd>{{ zdate($order->due_date, 'Y-m-d H:i') }}</dd>
+			</div>
+			@endif
+		</dl>
+	</section>
+	@endif
+
+	@if(!empty($order->extra['receipt_url']))
+	<p class="zpay-receipt">
+		<a href="{{ $order->extra['receipt_url'] }}" target="_blank" rel="noopener">{{ $lang->zpay_receipt }}</a>
+	</p>
+	@endif
+
+	@if($order->return_url)
+	<div class="zpay-actions">
+		<a class="zpay-btn zpay-btn-primary" href="{{ $order->return_url }}">{{ $lang->zpay_back_to_shop }}</a>
+	</div>
+	@endif
+</div>

@@ -1,0 +1,25 @@
+<query id="getOrderBySource" action="select">
+	<!--
+	  요청자 모듈(커머스·예약)이 자기 주문의 결제를 찾는 통로.
+	  zittme_pay_order 의 복합 인덱스 idx_source(source_module, source_srl) 가 그대로 덮는다.
+
+	  한 대상에 결제 시도가 여러 번 있을 수 있다(실패 후 재시도). 최신 것이 현재 상태이므로
+	  order_srl 내림차순으로 준다.
+	-->
+	<tables>
+		<table name="zittme_pay_order" />
+	</tables>
+	<columns>
+		<column name="*" />
+	</columns>
+	<conditions>
+		<condition operation="equal" column="source_module" var="source_module" required="true" />
+		<condition operation="equal" column="source_srl" var="source_srl" pipe="and" required="true" />
+		<condition operation="equal" column="status" var="status" pipe="and" />
+		<condition operation="in" column="status" var="status_list" pipe="and" />
+	</conditions>
+	<navigation>
+		<index var="sort_index" default="order_srl" order="desc" />
+		<list_count var="list_count" default="1" />
+	</navigation>
+</query>

@@ -1,0 +1,25 @@
+<query id="getExpiredOrders" action="select">
+	<!--
+	  입금 기한이 지난 무통장 주문. 조회 경로에서 게으르게 정리하므로 cron 이 필요 없다.
+	  (완전 설치형 원칙 — 외부 데몬을 요구하지 않는다)
+
+	  기한이 없는 주문은 due_date 가 빈 문자열이다. 빈 값은 어떤 날짜 문자열보다도 작으므로
+	  due_date > due_floor 한 줄로 걸러진다. notequal 로 빈 문자열을 비교하면 코어 파서가
+	  IS NOT NULL 로 바꿔 버려서 의도대로 동작하지 않는다.
+	-->
+	<tables>
+		<table name="zittme_pay_order" />
+	</tables>
+	<columns>
+		<column name="*" />
+	</columns>
+	<conditions>
+		<condition operation="in" column="status" var="status_list" required="true" />
+		<condition operation="excess" column="due_date" var="due_floor" pipe="and" required="true" />
+		<condition operation="below" column="due_date" var="now" pipe="and" required="true" />
+	</conditions>
+	<navigation>
+		<index var="sort_index" default="order_srl" order="asc" />
+		<list_count var="list_count" default="50" />
+	</navigation>
+</query>
