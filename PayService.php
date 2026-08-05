@@ -29,7 +29,7 @@ use Zittme\Modules\Zittme_pay\Models\Ticket;
  * 결제 완료는 되돌려 받지 않고 트리거로 통지한다 (느슨한 결합):
  *   zittme_pay.approved  / zittme_pay.cancelled
  *
- * ⚠️ 트리거를 받으려면 요청자 모듈의 conf/module.xml 에 eventHandler 를 선언한 뒤
+ * 주의: 트리거를 받으려면 요청자 모듈의 conf/module.xml 에 eventHandler 를 선언한 뒤
  *    관리자에서 그 모듈을 1회 업데이트해야 한다. XML 선언만으로는 등록되지 않는다.
  */
 class PayService
@@ -40,7 +40,7 @@ class PayService
 	 * 부가 모듈이라 아예 설치되지 않았을 수도 있다. 요청자 모듈은 이 값을 보고
 	 * 결제 기능만 비활성화하면 된다 — 없다고 해서 죽으면 안 된다.
 	 *
-	 * ⚠️ 모듈 폴더 자체가 없으면 이 클래스도 로드되지 않는다. 요청자 모듈은 반드시
+	 * 주의: 모듈 폴더 자체가 없으면 이 클래스도 로드되지 않는다. 요청자 모듈은 반드시
 	 *    클래스 존재 여부를 먼저 확인할 것:
 	 *
 	 *      if (class_exists('\Zittme\Modules\Zittme_pay\PayService') && PayService::isAvailable())

@@ -13,7 +13,7 @@ use Zittme\Modules\Zittme_pay\PayService;
 /**
  * 결제 진행 — 결제 화면, 결제 시작, PG 콜백, 웹훅, 결과 화면.
  *
- * ★★ 이 파일에서 가장 중요한 규칙 ★★
+ * 이 파일에서 가장 중요한 규칙 
  *
  * procZittme_payCallback 과 procZittme_payWebhook 은 "세션 금지 구역" 이다.
  * PG 는 이 두 액션을 크로스사이트로 호출하므로 SameSite 정책상 세션 쿠키가 함께 오지 않는다.
@@ -25,7 +25,7 @@ use Zittme\Modules\Zittme_pay\PayService;
  * Context::get() 으로 요청 변수를 읽는 것은 안전하지만, 로그인 정보를 조회하거나
  * 세션에 무언가를 저장하는 코드를 이 아래에 추가하지 말 것.
  *
- * ⚠️ 같은 이유로, zittme_pay.approved 트리거를 받는 요청자 모듈의 핸들러도 세션을 건드리면
+ * 주의: 같은 이유로, zittme_pay.approved 트리거를 받는 요청자 모듈의 핸들러도 세션을 건드리면
  *    안 된다. 그 핸들러는 콜백 요청 안에서 함께 실행된다.
  */
 class Pay extends Base
@@ -199,7 +199,7 @@ class Pay extends Base
 	}
 
 	/**
-	 * PG 리턴(콜백).  ★ 세션 금지 구역 — 파일 맨 위 주석을 반드시 읽을 것.
+	 * PG 리턴(콜백).  세션 금지 구역 — 파일 맨 위 주석을 반드시 읽을 것.
 	 *
 	 * 외부에서 호출되므로 module.xml 에서 check-csrf="false" 로 두었다. 대신 state 티켓과
 	 * 금액 대조로 자체 검증한다.
@@ -249,7 +249,7 @@ class Pay extends Base
 
 		$params = self::callbackParams();
 
-		// ★ 보안 3원칙 1 — 금액은 서버 것만 믿는다.
+		// 보안 3원칙 1 — 금액은 서버 것만 믿는다.
 		// 브라우저를 거쳐 온 금액이 주문 금액과 다르면 그 자리에서 끊는다. 승인 요청조차 보내지 않는다.
 		$client_amount = (int)($params['amount'] ?? 0);
 		if ($client_amount > 0 && $client_amount !== (int)$order->amount)
@@ -324,11 +324,11 @@ class Pay extends Base
 	}
 
 	/**
-	 * PG 웹훅.  ★ 세션 금지 구역.
+	 * PG 웹훅.  세션 금지 구역.
 	 *
 	 * 가상계좌 입금처럼 사용자의 브라우저와 무관하게 나중에 도착하는 통지를 받는다.
 	 *
-	 * ★ 보안 3원칙 2 — 본문을 믿지 않는다.
+	 * 보안 3원칙 2 — 본문을 믿지 않는다.
 	 * 웹훅 본문은 누구나 흉내 낼 수 있다. 그래서 본문의 상태·금액을 그대로 쓰지 않고
 	 * 반드시 PG 조회 API 로 다시 물어본 결과만 반영한다.
 	 */
@@ -384,7 +384,7 @@ class Pay extends Base
 			return;
 		}
 
-		// ★ 재조회. 여기서 나온 값만 믿는다.
+		// 재조회. 여기서 나온 값만 믿는다.
 		$verified = $driver->query($tid ?: (string)$order->pg_tid);
 
 		Log::add([

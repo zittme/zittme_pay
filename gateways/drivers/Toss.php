@@ -15,7 +15,7 @@ use Zittme\Modules\Zittme_pay\Models\Order;
  *      (paymentKey, orderId, amount 를 쿼리로 달고 온다)
  *   3) 우리 서버가 confirm API 를 호출해야 비로소 승인이 확정된다 ← approve()
  *
- * ⚠️ 2번에서 돌아온 amount 는 브라우저를 거쳐 온 값이라 믿을 수 없다. 승인은 반드시
+ * 주의: 2번에서 돌아온 amount 는 브라우저를 거쳐 온 값이라 믿을 수 없다. 승인은 반드시
  *    서버가 들고 있는 $order->amount 로 건다. 대조는 컨트롤러에서 한 번 더 한다.
  *
  * 테스트/운영은 엔드포인트가 아니라 키로 갈린다(test_ck_… / live_ck_…). 그래서 이 드라이버는
@@ -133,7 +133,7 @@ class Toss extends Base
 			[
 				'paymentKey' => $payment_key,
 				'orderId' => (string)$order->order_code,
-				// ★ 서버 금액. 브라우저가 보낸 값이 아니다.
+				// 서버 금액. 브라우저가 보낸 값이 아니다.
 				'amount' => (int)$order->amount,
 			],
 			$this->authHeaders()
