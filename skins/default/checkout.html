@@ -6,7 +6,12 @@
 
 	<header class="zpay-head">
 		<h1 class="zpay-title">{{ $lang->zpay_checkout_title }}</h1>
+		@php $zpay_src = Context::get('source_order_code'); @endphp
+		@if (!empty($zpay_src))
+		<p class="zpay-order-code">주문번호 <span>{{ $zpay_src }}</span></p>
+		@else
 		<p class="zpay-order-code">{{ $lang->zpay_order_code }} <span>{{ $order->order_code }}</span></p>
+		@endif
 	</header>
 
 	<section class="zpay-summary">
@@ -24,7 +29,7 @@
 			@endif
 			<div class="zpay-summary-row zpay-summary-total">
 				<dt>{{ $lang->zpay_amount }}</dt>
-				<dd><strong>{{ number_format($order->amount) }}</strong> {{ $order->currency }}</dd>
+				<dd><strong>{{ \Zittme\Modules\Zittme_pay\Models\Currency::money($order->amount, $order->currency ?? 'KRW') }}</strong></dd>
 			</div>
 		</dl>
 	</section>
@@ -78,7 +83,7 @@
 
 	<div class="zpay-actions">
 		<button type="button" class="zpay-btn zpay-btn-primary" id="zpay-submit" disabled>
-			{{ sprintf($lang->zpay_pay_button, number_format($order->amount)) }}
+			{{ sprintf($lang->zpay_pay_button, \Zittme\Modules\Zittme_pay\Models\Currency::money($order->amount, $order->currency ?? 'KRW')) }}
 		</button>
 	</div>
 

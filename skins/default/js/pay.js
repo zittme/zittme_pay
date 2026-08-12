@@ -137,6 +137,118 @@
 			return;
 		}
 
+		if (gatewayName === 'inicis') {
+			if (!window.INIStdPay || typeof window.INIStdPay.pay !== 'function') {
+				showError('INIStdPay SDK not loaded');
+				setBusy(false);
+				return;
+			}
+			// 이니시스는 폼 POST 방식이라 숨은 폼을 만들어 넘긴다
+			var oldForm = document.getElementById('zpay-inicis-form');
+			if (oldForm) {
+				oldForm.parentNode.removeChild(oldForm);
+			}
+			var form = document.createElement('form');
+			form.id = 'zpay-inicis-form';
+			form.method = 'post';
+			form.hidden = true;
+			Object.keys(payload.fields || {}).forEach(function(key) {
+				var input = document.createElement('input');
+				input.type = 'hidden';
+				input.name = key;
+				input.value = payload.fields[key];
+				form.appendChild(input);
+			});
+			document.body.appendChild(form);
+			window.INIStdPay.pay('zpay-inicis-form');
+			setBusy(false);
+			return;
+		}
+
+		if (gatewayName === 'kcp') {
+			if (typeof window.KCP_Pay_Execute_Web !== 'function') {
+				showError('KCP SDK not loaded');
+				setBusy(false);
+				return;
+			}
+			// KCP 도 폼 방식이라 숨은 폼을 만들어 넘긴다
+			var oldKcpForm = document.getElementById('zpay-kcp-form');
+			if (oldKcpForm) {
+				oldKcpForm.parentNode.removeChild(oldKcpForm);
+			}
+			var kcpForm = document.createElement('form');
+			kcpForm.id = 'zpay-kcp-form';
+			kcpForm.name = 'zpay_kcp_form';
+			kcpForm.method = 'post';
+			kcpForm.hidden = true;
+			Object.keys(payload.fields || {}).forEach(function(key) {
+				var input = document.createElement('input');
+				input.type = 'hidden';
+				input.name = key;
+				input.value = payload.fields[key];
+				kcpForm.appendChild(input);
+			});
+			document.body.appendChild(kcpForm);
+			window.KCP_Pay_Execute_Web(kcpForm);
+			setBusy(false);
+			return;
+		}
+
+		if (gatewayName === 'nicepay') {
+			if (!window.AUTHNICE || typeof window.AUTHNICE.requestPay !== 'function') {
+				showError('NICE Pay SDK not loaded');
+				setBusy(false);
+				return;
+			}
+			window.AUTHNICE.requestPay({
+				clientId: payload.clientId,
+				method: payload.method,
+				orderId: payload.orderId,
+				amount: payload.amount,
+				goodsName: payload.goodsName,
+				buyerName: payload.buyerName,
+				buyerEmail: payload.buyerEmail,
+				buyerTel: payload.buyerTel,
+				returnUrl: payload.returnUrl,
+				fnError: function(result) {
+					showError(result && result.errorMsg ? result.errorMsg : 'payment failed');
+					setBusy(false);
+				}
+			});
+			// 인증이 끝나면 나이스페이가 returnUrl 로 POST 한다. 여기서 할 일은 없다.
+			return;
+		}
+
+		if (gatewayName === 'portone') {
+			if (!window.PortOne || typeof window.PortOne.requestPayment !== 'function') {
+				showError('PortOne SDK not loaded');
+				setBusy(false);
+				return;
+			}
+			window.PortOne.requestPayment({
+				storeId: payload.storeId,
+				channelKey: payload.channelKey,
+				paymentId: payload.paymentId,
+				orderName: payload.orderName,
+				totalAmount: payload.totalAmount,
+				currency: payload.currency,
+				customer: payload.customer,
+				redirectUrl: payload.redirectUrl
+			}).then(function(response) {
+				if (response && response.code) {
+					showError(response.message || 'payment failed');
+					setBusy(false);
+					return;
+				}
+				// PC 는 같은 창에서 끝난다. 결과 확정은 서버 콜백(조회 검증)이 한다.
+				window.location.href = payload.redirectUrl + '&paymentId=' + encodeURIComponent(payload.paymentId);
+			}).catch(function(error) {
+				showError(error && error.message ? error.message : 'payment cancelled');
+				setBusy(false);
+			});
+			return;
+		}
+
 		showError('unsupported gateway: ' + gatewayName);
 		setBusy(false);
 	}

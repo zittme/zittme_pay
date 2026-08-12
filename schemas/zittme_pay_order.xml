@@ -12,6 +12,8 @@
 	-->
 	<column name="source_module" type="varchar" size="40" notnull="notnull" default="" />
 	<column name="source_srl" type="bigint" notnull="notnull" default="0" />
+	<!-- 출처 모듈의 주문번호 (사용자 대표 번호) -->
+	<column name="source_code" type="varchar" size="80" />
 
 	<column name="member_srl" type="bigint" notnull="notnull" default="0" index="idx_member_srl" />
 	<column name="payer_name" type="varchar" size="80" />

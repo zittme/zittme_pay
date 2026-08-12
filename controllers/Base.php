@@ -82,14 +82,18 @@ class Base extends \ModuleObject
 	public static function getSkinName(): string
 	{
 		$instance = self::getDefaultInstance();
-		$skin = $instance->skin ?? '';
+		$skin = (string)($instance->skin ?? '');
+		// 기본 스킨 위임이면 사이트 기본 디자인 값을 따른다 (테마 적용이 여길 바꾼다)
 		if ($skin === '' || $skin === '/USE_DEFAULT/')
+		{
+			$skin = (string)(\ModuleModel::getModuleDefaultSkin('zittme_pay', 'P') ?: 'default');
+		}
+		// 일반 이름과 테마 결합명('테마|@|스킨')만 허용 — 경로 조작 방지
+		if (!preg_match('/^[A-Za-z0-9_-]+(\|@\|[A-Za-z0-9_-]+)?$/', $skin))
 		{
 			$skin = 'default';
 		}
-		// 경로 조작 방지 — 스킨 이름에 들어갈 수 있는 글자만 남긴다.
-		$skin = preg_replace('/[^A-Za-z0-9_-]/', '', (string)$skin);
-		return $skin !== '' ? $skin : 'default';
+		return $skin;
 	}
 
 	/**
@@ -103,12 +107,12 @@ class Base extends \ModuleObject
 	public function getSkinPath(): string
 	{
 		$skin = self::getSkinName();
-		$path = $this->module_path . 'skins/' . $skin . '/';
-		if (!is_dir(\RX_BASEDIR . 'modules/zittme_pay/skins/' . $skin))
+		$path = \Zittme\Framework\Theme::resolveSkinPath($this->module_path, $skin, 'skins');
+		if (!is_dir($path))
 		{
 			$path = $this->module_path . 'skins/default/';
 		}
-		return $path;
+		return rtrim($path, '/') . '/';
 	}
 
 	/**

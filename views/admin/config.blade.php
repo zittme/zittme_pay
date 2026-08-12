@@ -140,4 +140,29 @@
 			</div>
 		</div>
 	</form>
+
+	<div class="section" style="margin-top:18px">
+		<h1>스킨 설정</h1>
+		<form action="./" method="post">
+			<input type="hidden" name="module" value="zittme_pay" />
+			<input type="hidden" name="act" value="procZittme_payAdminUpdateSkin" />
+			<div class="x_control-group">
+				<label class="x_control-label" for="zpay_skin">결제 화면 스킨</label>
+				<div class="x_controls">
+					<select id="zpay_skin" name="skin">
+						<option value="/USE_DEFAULT/" @if (($zpay_instance->skin ?? '') === '/USE_DEFAULT/' || ($zpay_instance->skin ?? '') === '') selected @endif>기본 디자인 따름 (현재: {{ $zpay_default_skin }})</option>
+						@foreach ($zpay_skins as $zpay_sk)
+						<option value="{{ $zpay_sk->skin }}" @if (($zpay_instance->skin ?? '') === $zpay_sk->skin) selected @endif>{{ $zpay_sk->title ?: $zpay_sk->skin }}</option>
+						@endforeach
+					</select>
+					<p class="x_help-block">기본 디자인 따름으로 두면 사이트 디자인 설정(테마 적용 포함)의 스킨을 그대로 씁니다.</p>
+				</div>
+			</div>
+			<div class="x_clearfix">
+				<div class="x_pull-right">
+					<button type="submit" class="x_btn x_btn-primary">스킨 적용</button>
+				</div>
+			</div>
+		</form>
+	</div>
 </section>

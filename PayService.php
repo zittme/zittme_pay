@@ -101,12 +101,15 @@ class PayService
 		$order->order_code = Order::generateOrderCode((string)$config->order_prefix);
 		$order->source_module = $source_module;
 		$order->source_srl = $source_srl;
+		// 출처 모듈의 주문번호 — 결제·결과 화면에서 사용자에게 대표로 보여준다
+		$order->source_code = mb_substr(trim((string)($args['source_code'] ?? '')), 0, 80);
 		$order->member_srl = (int)($args['member_srl'] ?? self::currentMemberSrl());
 		$order->payer_name = mb_substr((string)($payer['name'] ?? ''), 0, 80);
 		$order->payer_phone = mb_substr((string)($payer['phone'] ?? ''), 0, 40);
 		$order->payer_email = mb_substr((string)($payer['email'] ?? ''), 0, 120);
 		$order->title = mb_substr((string)($args['title'] ?? ''), 0, 250);
-		$order->currency = (string)$config->currency;
+		// 요청자 모듈이 통화를 넘기면 그 통화로 결제한다 (외화 주문). 금액은 통화 최소단위 정수.
+		$order->currency = strtoupper(trim((string)($args['currency'] ?? ''))) ?: (string)$config->currency;
 		$order->amount = $amount;
 		$order->cancelled_amount = 0;
 		$order->gateway = '';

@@ -30,6 +30,40 @@ class Config
 		'enabled_gateways' => ['banktransfer'],
 		'toss_client_key' => '',
 		'toss_secret_key' => '',
+		// KG이니시스 (INIStdPay). 취소는 INIAPI 라 키가 따로 있다.
+		// 테스트: mid INIpayTest / signKey SU5JTElURV9UUklQTEVERVNfS0VZU1RS / INIAPI key ItEQKi3rY7uvDS8l
+		'inicis_mid' => '',
+		'inicis_sign_key' => '',
+		'inicis_api_key' => '',
+		// NHN KCP. 인증서는 PEM 본문을 그대로 붙여 넣는다. 취소는 상점 개인키 서명이 필요하다.
+		'kcp_site_cd' => '',
+		'kcp_cert_info' => '',
+		'kcp_priv_key' => '',
+		'kcp_priv_pass' => '',
+		// 나이스페이 (신형 v1 API). 테스트 키는 개발자센터 샌드박스에서 발급.
+		'nicepay_client_id' => '',
+		'nicepay_secret_key' => '',
+		// 포트원 V2. 어느 PG 로 나갈지는 포트원 콘솔의 채널에서 정한다.
+		'portone_store_id' => '',
+		'portone_channel_key' => '',
+		'portone_api_secret' => '',
+		'paypal_client_id' => '',
+		'paypal_secret' => '',
+		// 페이팔은 KRW 를 지원하지 않는다. 이 통화로 환산해 결제한다.
+		'paypal_currency' => 'USD',
+		// 1 결제통화당 KRW. 관리자가 직접 입력한다. 비어 있으면 페이팔은 비활성으로 취급된다.
+		'paypal_exchange_rate' => '',
+
+		// 공용 환율 (Currency 모델이 관리). 짓미페이와 커머스가 함께 참조한다.
+		'exchange_rates' => [],
+		// 수동 고정 통화. 자동 갱신이 이 통화는 덮지 않는다. ['USD' => 'Y']
+		'exchange_rates_manual' => [],
+		'exchange_auto' => 'N',
+		// erapi(키 불필요) / koreaexim(수출입은행, API 키 필요)
+		'exchange_source' => 'erapi',
+		'exchange_api_key' => '',
+		'exchange_updated' => '',
+		'exchange_attempted' => '',
 		// 무통장 입금 계좌 목록. [['bank'=>'국민','account'=>'...','holder'=>'...'], ...]
 		'bank_accounts' => [],
 		// 입금 기한(일). 지나면 주문을 만료 처리한다.
@@ -89,7 +123,7 @@ class Config
 			}
 
 			// 배열로 쓰는 값이 문자열로 저장돼 있으면 이후 foreach 가 죽는다. 여기서 바로잡는다.
-			foreach (['enabled_gateways', 'bank_accounts'] as $key)
+			foreach (['enabled_gateways', 'bank_accounts', 'exchange_rates', 'exchange_rates_manual'] as $key)
 			{
 				if (!is_array($config->{$key}))
 				{

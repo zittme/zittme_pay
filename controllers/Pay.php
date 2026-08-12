@@ -46,6 +46,9 @@ class Pay extends Base
 		// 기한이 지난 무통장 주문을 이 참에 정리한다 (cron 없이 조회 경로에서 처리).
 		Order::expireOverdue();
 
+		// 환율 자동 갱신도 같은 방식으로 하루 1회 여기서 돈다.
+		\Zittme\Modules\Zittme_pay\Models\Currency::refreshIfStale();
+
 		$order = Order::getByCode((string)\Context::get('order_code'));
 		if (!$order)
 		{
@@ -79,6 +82,11 @@ class Pay extends Base
 		$client_scripts = [];
 		foreach ($drivers as $name => $driver)
 		{
+			// 주문 통화를 처리 못 하는 결제수단은 화면에 올리지 않는다 (외화 주문)
+			if (!$driver->supportsCurrency((string)($order->currency ?: 'KRW')))
+			{
+				continue;
+			}
 			$gateway_info[$name] = [
 				'name' => $name,
 				'title' => $driver->getTitle(),
@@ -93,6 +101,7 @@ class Pay extends Base
 		}
 
 		\Context::set('order', $order);
+		\Context::set('source_order_code', self::sourceOrderCode($order));
 		\Context::set('pay_state', $state);
 		\Context::set('pay_config', $config);
 		\Context::set('gateways', $gateway_info);
@@ -108,8 +117,10 @@ class Pay extends Base
 		{
 			\Context::addJsFile($script);
 		}
-		\Context::addCSSFile($this->module_path . 'skins/' . self::getSkinName() . '/css/pay.css');
-		\Context::addJsFile($this->module_path . 'skins/' . self::getSkinName() . '/js/pay.js');
+		// 테마 결합명('테마|@|스킨')도 실제 경로로 해석해서 로드한다 (절대경로는 웹 상대경로로 변환)
+		$asset_base = './' . ltrim(str_replace(\RX_BASEDIR, '', $this->getSkinPath()), './');
+		\Context::addCSSFile($asset_base . 'css/pay.css');
+		\Context::addJsFile($asset_base . 'js/pay.js');
 
 		$this->setTemplatePath($this->getSkinPath());
 		$this->setTemplateFile('checkout');
@@ -158,6 +169,32 @@ class Pay extends Base
 			$this->add('gateway', $gateway_name);
 			$this->add('requires_client', true);
 			$this->add('request', $driver->buildRequest($order, $state));
+			return;
+		}
+
+		// PG 페이지로 보내는 결제수단 (페이팔 등). PG 주문을 만들고 승인 페이지로 보낸다.
+		if ($driver->requiresRedirect())
+		{
+			$redirect = $driver->buildRedirect($order, $state);
+
+			Log::add([
+				'order_srl' => (int)$order->order_srl,
+				'order_code' => $order->order_code,
+				'gateway' => $gateway_name,
+				'action' => 'ready',
+				'amount' => (int)$order->amount,
+				'pg_tid' => (string)($redirect['pg_order_id'] ?? ''),
+				'response_data' => $redirect['raw'] ?? ($redirect['error'] ?? ($redirect['redirect_url'] ?? '')),
+				'result' => empty($redirect['error']) ? 'S' : 'F',
+			]);
+
+			if (!empty($redirect['error']) || empty($redirect['redirect_url']))
+			{
+				throw new \Zittme\Framework\Exception($redirect['error'] ?: lang('zittme_pay.msg_pg_error'));
+			}
+
+			$this->add('requires_client', false);
+			$this->setRedirectUrl($redirect['redirect_url']);
 			return;
 		}
 
@@ -469,11 +506,14 @@ class Pay extends Base
 		}
 
 		\Context::set('order', $order);
+		\Context::set('source_order_code', self::sourceOrderCode($order));
 		\Context::set('pay_config', self::config());
 		\Context::set('claim_result', $claimed);
 		\Context::set('claim_message', (string)($claimed['message'] ?? ''));
 
-		\Context::addCSSFile($this->module_path . 'skins/' . self::getSkinName() . '/css/pay.css');
+		// 테마 결합명('테마|@|스킨')도 실제 경로로 해석해서 로드한다 (절대경로는 웹 상대경로로 변환)
+		$asset_base = './' . ltrim(str_replace(\RX_BASEDIR, '', $this->getSkinPath()), './');
+		\Context::addCSSFile($asset_base . 'css/pay.css');
 
 		$this->setTemplatePath($this->getSkinPath());
 		$this->setTemplateFile('result');
@@ -482,6 +522,53 @@ class Pay extends Base
 	/* ---------------------------------------------------------------------
 	 * 내부 헬퍼
 	 * ------------------------------------------------------------------- */
+
+	/**
+	 * 출처 모듈의 주문번호 — 사용자에게는 이 번호를 대표로 보여준다 (결제번호는 보조).
+	 *
+	 * @param object $order
+	 * @return string
+	 */
+	protected static function sourceOrderCode(object $order): string
+	{
+		// 신규 주문은 생성 시 넘겨받은 source_code 를 그대로 쓴다 (모듈 독립적)
+		if (!empty($order->source_code))
+		{
+			return (string)$order->source_code;
+		}
+		// 과거 주문 호환: 출처 모듈 테이블에서 직접 조회
+		$source_srl = (int)($order->source_srl ?? 0);
+		$module = (string)($order->source_module ?? '');
+		if ($source_srl <= 0 || $module === '')
+		{
+			return '';
+		}
+		try
+		{
+			$prefix = (string)(\Rhymix\Framework\Config::get('db.master.prefix') ?? '');
+			$handle = \Rhymix\Framework\DB::getInstance()->getHandle();
+			if ($module === 'commerce')
+			{
+				$stmt = $handle->prepare('SELECT order_code FROM `' . $prefix . 'commerce_order` WHERE order_srl = ?');
+			}
+			elseif ($module === 'reservation')
+			{
+				$stmt = $handle->prepare('SELECT booking_code AS order_code FROM `' . $prefix . 'reservation_booking` WHERE booking_srl = ?');
+			}
+			else
+			{
+				return '';
+			}
+			if ($stmt && $stmt->execute([$source_srl]))
+			{
+				return (string)($stmt->fetchColumn() ?: '');
+			}
+		}
+		catch (\Throwable $e)
+		{
+		}
+		return '';
+	}
 
 	/**
 	 * 승인 결과를 주문에 반영한다.
@@ -539,7 +626,7 @@ class Pay extends Base
 	 */
 	protected static function callbackParams(): array
 	{
-		$keys = ['paymentKey', 'orderId', 'amount', 'tid', 'code', 'message', 'pg_token', 'imp_uid', 'merchant_uid'];
+		$keys = ['paymentKey', 'orderId', 'amount', 'tid', 'code', 'message', 'pg_token', 'imp_uid', 'merchant_uid', 'token', 'PayerID', 'paymentId', 'authResultCode', 'resultCode', 'authToken', 'authUrl', 'netCancelUrl', 'res_cd', 'res_msg', 'enc_data', 'enc_info', 'tran_cd'];
 
 		$params = [];
 		foreach ($keys as $key)

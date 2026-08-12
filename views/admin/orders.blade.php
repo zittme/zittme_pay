@@ -59,13 +59,25 @@
 				<td>{{ $item->title }}</td>
 				<td>{{ $item->payer_name }}</td>
 				<td>
-					{{ number_format($item->amount) }}
+					{{ \Zittme\Modules\Zittme_pay\Models\Currency::money($item->amount, $item->currency ?? 'KRW') }}
 					@if($item->cancelled_amount > 0)
-					<span class="x_text-error">(-{{ number_format($item->cancelled_amount) }})</span>
+					<span class="x_text-error">(-{{ \Zittme\Modules\Zittme_pay\Models\Currency::money($item->cancelled_amount, $item->currency ?? 'KRW') }})</span>
 					@endif
 				</td>
 				<td>{{ $item->gateway }}</td>
-				<td>{{ $status_labels[$item->status] ?? $item->status }}</td>
+				<td>
+					{{ $status_labels[$item->status] ?? $item->status }}
+					{{-- 무통장 입금대기 건은 목록에서 바로 입금확인 처리할 수 있게 한다 --}}
+					@if(in_array($item->status, ['ready', 'pending'], true))
+					<form action="./" method="post" style="display:inline;margin-left:6px" onsubmit="return confirm('{{ $lang->zpay_confirm_deposit_ask ?? '입금을 확인하셨습니까? 확인 처리하면 결제완료로 바뀝니다.' }}')">
+						<input type="hidden" name="module" value="zittme_pay" />
+						<input type="hidden" name="act" value="procZittme_payAdminConfirmDeposit" />
+						<input type="hidden" name="order_srl" value="{{ $item->order_srl }}" />
+						<input type="hidden" name="success_return_url" value="{{ getUrl('', 'module', 'admin', 'act', 'dispZittme_payAdminOrders') }}" />
+						<button type="submit" class="x_btn x_btn-small x_btn-primary">{{ $lang->zpay_confirm_deposit ?? '입금확인' }}</button>
+					</form>
+					@endif
+				</td>
 				<td>{{ zdate($item->regdate, 'Y-m-d H:i') }}</td>
 			</tr>
 			@endforeach

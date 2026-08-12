@@ -31,13 +31,13 @@
 			</tr>
 			<tr>
 				<th>{{ $lang->zpay_amount }}</th>
-				<td>{{ number_format($order->amount) }} {{ $order->currency }}</td>
+				<td>{{ \Zittme\Modules\Zittme_pay\Models\Currency::money($order->amount, $order->currency ?? 'KRW') }}</td>
 			</tr>
 			<tr>
 				<th>{{ $lang->zpay_cancelled_amount }}</th>
 				<td>
-					{{ number_format($order->cancelled_amount) }}
-					({{ $lang->zpay_remain_amount }} {{ number_format($order->remain_amount) }})
+					{{ \Zittme\Modules\Zittme_pay\Models\Currency::money($order->cancelled_amount, $order->currency ?? 'KRW') }}
+					({{ $lang->zpay_remain_amount }} {{ \Zittme\Modules\Zittme_pay\Models\Currency::money($order->remain_amount, $order->currency ?? 'KRW') }})
 				</td>
 			</tr>
 			<tr>
@@ -102,7 +102,7 @@
 		<h3 class="x_text-error">{{ $lang->zpay_manual_refund_title }}</h3>
 		<p class="x_help-block">{{ $lang->zpay_manual_refund_help }}</p>
 		<p>
-			<strong>{{ number_format($order->refund_amount) }}</strong> {{ $order->currency }}
+			<strong>{{ \Zittme\Modules\Zittme_pay\Models\Currency::money($order->refund_amount, $order->currency ?? 'KRW') }}</strong>
 			@if($order->extra['bank'] ?? '')
 			— {{ $order->extra['bank'] }} {{ $order->extra['account'] ?? '' }}
 			({{ $order->extra['depositor_name'] ?? ($order->extra['holder'] ?? '') }})
@@ -120,7 +120,7 @@
 		<h3>{{ $lang->zpay_manual_refund_title }}</h3>
 		<p>
 			{{ $lang->zpay_manual_refund_sent }} —
-			{{ number_format($order->refund_amount) }} {{ $order->currency }}
+			{{ \Zittme\Modules\Zittme_pay\Models\Currency::money($order->refund_amount, $order->currency ?? 'KRW') }}
 			@if($order->refund_date) ({{ zdate($order->refund_date, 'Y-m-d H:i') }}) @endif
 		</p>
 	</div>
@@ -206,7 +206,7 @@
 					S
 					@endif
 				</td>
-				<td>{{ number_format($log->amount) }}</td>
+				<td>{{ \Zittme\Modules\Zittme_pay\Models\Currency::money($log->amount, $order->currency ?? 'KRW') }}</td>
 				<td><code>{{ mb_substr($log->response_data, 0, 300) }}</code></td>
 			</tr>
 			@endforeach

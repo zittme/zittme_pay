@@ -25,6 +25,8 @@ class Install extends Base
 		['zittme_pay_order', 'refund_state', 'varchar', 20],
 		['zittme_pay_order', 'refund_amount', 'bigint', null],
 		['zittme_pay_order', 'refund_date', 'char', 14],
+		// 0.1.2 — 출처 모듈의 주문번호 (사용자 대표 번호, 결제번호는 내부용)
+		['zittme_pay_order', 'source_code', 'varchar', 80],
 	];
 
 	/**

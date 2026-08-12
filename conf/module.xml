@@ -41,6 +41,7 @@
 		<action name="dispZittme_payAdminLogs" class="Controllers\Admin" menu-name="zittme_pay" permission="manager" />
 
 		<action name="procZittme_payAdminInsertConfig" class="Controllers\Admin" permission="manager" />
+		<action name="procZittme_payAdminUpdateSkin" class="Controllers\Admin" permission="manager" />
 		<action name="procZittme_payCancel" class="Controllers\Admin" permission="manager" />
 		<action name="procZittme_payAdminConfirmDeposit" class="Controllers\Admin" permission="manager" />
 		<action name="procZittme_payAdminCompleteRefund" class="Controllers\Admin" permission="manager" />

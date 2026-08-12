@@ -21,6 +21,11 @@ abstract class Base
 	 */
 	public static array $supported_gateways = [
 		'toss',
+		'inicis',
+		'kcp',
+		'nicepay',
+		'portone',
+		'paypal',
 		'banktransfer',
 	];
 
@@ -130,6 +135,40 @@ abstract class Base
 	public function getClientScript(): string
 	{
 		return '';
+	}
+
+	/**
+	 * 결제를 PG 페이지로 리다이렉트해서 진행하는가 (페이팔 등).
+	 *
+	 * true 면 결제 시작 시 buildRedirect 가 만든 주소로 브라우저를 보낸다.
+	 * SDK 결제창(requiresClientPayment)과 서버 즉시 처리(무통장) 어느 쪽도 아닌 세 번째 형태다.
+	 */
+	public function requiresRedirect(): bool
+	{
+		return false;
+	}
+
+	/**
+	 * 이 드라이버가 해당 통화의 결제를 처리할 수 있는가.
+	 *
+	 * 국내 PG 는 KRW 전용이 기본값이다. 외화를 받는 드라이버(페이팔 등)가 재정의한다.
+	 * 결제 화면은 주문 통화를 지원하는 드라이버만 보여준다.
+	 */
+	public function supportsCurrency(string $currency): bool
+	{
+		return strtoupper($currency) === 'KRW';
+	}
+
+	/**
+	 * PG 쪽 결제 페이지 주소를 만든다. requiresRedirect 가 true 인 드라이버만 구현한다.
+	 *
+	 * @param object $order
+	 * @param string $state
+	 * @return array ['redirect_url' => ...] 또는 ['error' => 메시지]
+	 */
+	public function buildRedirect(object $order, string $state): array
+	{
+		return ['error' => 'not supported'];
 	}
 
 	/**

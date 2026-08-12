@@ -32,6 +32,12 @@ class Admin extends Base
 		],
 		'gateway' => [
 			'enabled_gateways', 'toss_client_key', 'toss_secret_key',
+			'inicis_mid', 'inicis_sign_key', 'inicis_api_key',
+			'kcp_site_cd', 'kcp_cert_info', 'kcp_priv_key', 'kcp_priv_pass',
+			'nicepay_client_id', 'nicepay_secret_key',
+			'portone_store_id', 'portone_channel_key', 'portone_api_secret',
+			'paypal_client_id', 'paypal_secret', 'paypal_currency', 'paypal_exchange_rate',
+			'exchange_rates', 'exchange_rates_manual', 'exchange_auto', 'exchange_source', 'exchange_api_key',
 			'bank_accounts', 'bank_due_days',
 		],
 	];
@@ -41,7 +47,7 @@ class Admin extends Base
 	 */
 	protected const BOOLEAN_FIELDS = [
 		'enabled', 'test_mode', 'allow_partial_cancel', 'notify_on_paid', 'notify_on_cancel',
-		'allow_force_cancel',
+		'allow_force_cancel', 'exchange_auto',
 	];
 
 	/**
@@ -73,7 +79,44 @@ class Admin extends Base
 	public function dispZittme_payAdminConfig()
 	{
 		$this->setCommonContext('config');
+
+		// 스킨 — 커머스·예약 콘솔과 같은 방식. 기본값(/USE_DEFAULT/)이면 사이트 기본 디자인을 따른다.
+		$instance = self::getDefaultInstance();
+		$module_info = $instance ? \ModuleModel::getModuleInfoByMid($instance->mid) : null;
+		\Context::set('zpay_instance', $module_info);
+		\Context::set('zpay_skins', \ModuleModel::getSkins(\RX_BASEDIR . 'modules/zittme_pay') ?: []);
+		\Context::set('zpay_default_skin', (string)(\ModuleModel::getModuleDefaultSkin('zittme_pay', 'P') ?: 'default'));
+
 		$this->setTemplateFile('config');
+	}
+
+	/**
+	 * 스킨 저장 — 기본 인스턴스(mid)의 skin 갱신.
+	 */
+	public function procZittme_payAdminUpdateSkin()
+	{
+		$instance = self::getDefaultInstance();
+		$module_info = $instance ? \ModuleModel::getModuleInfoByMid($instance->mid) : null;
+		if (!$module_info || empty($module_info->module_srl))
+		{
+			return new \BaseObject(-1, 'msg_invalid_request');
+		}
+
+		$skin = preg_replace('/[^A-Za-z0-9_\-.\/|@]/', '', (string)\Context::get('skin'));
+		if ($skin !== '')
+		{
+			$module_info->skin = $skin;
+			// is_skin_fix 가 N 이면 코어가 저장된 스킨을 무시하고 기본 디자인을 따른다
+			$module_info->is_skin_fix = ($skin === '/USE_DEFAULT/') ? 'N' : 'Y';
+		}
+		$module_info->isMenuCreate = false;
+
+		$output = \ModuleController::getInstance()->updateModule($module_info);
+		if (!$output->toBool())
+		{
+			return $output;
+		}
+		$this->setRedirectUrl(\Context::get('success_return_url') ?: getNotEncodedUrl('', 'module', 'admin', 'act', 'dispZittme_payAdminConfig'));
 	}
 
 	/**
@@ -189,7 +232,8 @@ class Admin extends Base
 		\Context::set('order', $order);
 		\Context::set('order_logs', $log_output->data ?: []);
 		\Context::set('cancel_reasons', ConfigModel::getCancelReasons());
-		\Context::set('can_confirm_deposit', $order->status === Order::STATUS_PENDING && $order->gateway === 'banktransfer');
+		// 준비(ready) 단계에서 입금부터 하는 고객도 있으므로 미결제(open) 상태면 모두 허용한다
+		\Context::set('can_confirm_deposit', in_array($order->status, Order::OPEN_STATUSES, true));
 		\Context::set('can_cancel', in_array($order->status, Order::CANCELLABLE_STATUSES, true));
 
 		// 확정된 건은 기본적으로 잠긴다. 관리자가 강제로만 열 수 있고, 그것도 설정으로 막을 수 있다.
@@ -318,7 +362,8 @@ class Admin extends Base
 		{
 			throw new TargetNotFound;
 		}
-		if ($order->status !== Order::STATUS_PENDING)
+		// ready(결제창 진입 전)·pending(입금대기) 모두 수동 입금확인을 허용한다
+		if (!in_array($order->status, Order::OPEN_STATUSES, true))
 		{
 			throw new Exception('zittme_pay.msg_not_pending');
 		}
@@ -345,7 +390,9 @@ class Admin extends Base
 		}
 
 		$this->setMessage('zittme_pay.msg_deposit_confirmed');
-		$this->setRedirectUrl(getNotEncodedUrl('', 'module', 'admin', 'act', 'dispZittme_payAdminOrderView', 'order_srl', (int)$order->order_srl));
+		// 커머스 콘솔 등 다른 화면에서 부르면 그 화면으로 복귀한다
+		$this->setRedirectUrl(\Context::get('success_return_url')
+			?: getNotEncodedUrl('', 'module', 'admin', 'act', 'dispZittme_payAdminOrderView', 'order_srl', (int)$order->order_srl));
 	}
 
 	/**
@@ -482,6 +529,21 @@ class Admin extends Base
 			return self::collectBankAccounts($vars);
 		}
 
+		if ($key === 'exchange_rates')
+		{
+			return self::collectExchangeRates($vars)[0];
+		}
+
+		if ($key === 'exchange_rates_manual')
+		{
+			return self::collectExchangeRates($vars)[1];
+		}
+
+		if ($key === 'exchange_source')
+		{
+			return in_array($value, \Zittme\Modules\Zittme_pay\Models\Currency::SOURCES, true) ? $value : 'erapi';
+		}
+
 		if ($key === 'currency')
 		{
 			$currency = strtoupper(preg_replace('/[^A-Za-z]/', '', (string)$value));
@@ -500,6 +562,42 @@ class Admin extends Base
 		}
 
 		return is_string($value) ? trim($value) : $value;
+	}
+
+	/**
+	 * 환율 입력을 모은다. 통화·환율·수동고정이 각각 배열로 온다.
+	 *
+	 * @param ?object $vars
+	 * @return array [환율 맵, 수동고정 맵]
+	 */
+	protected static function collectExchangeRates(?object $vars): array
+	{
+		if (!$vars)
+		{
+			return [[], []];
+		}
+
+		$codes = is_array($vars->fx_code ?? null) ? $vars->fx_code : [];
+		$rates = is_array($vars->fx_rate ?? null) ? $vars->fx_rate : [];
+		$manuals = is_array($vars->fx_manual ?? null) ? $vars->fx_manual : [];
+
+		$rate_map = [];
+		$manual_map = [];
+		foreach ($codes as $index => $code)
+		{
+			$code = strtoupper(preg_replace('/[^A-Za-z]/', '', (string)$code));
+			$rate = (float)str_replace(',', '', (string)($rates[$index] ?? ''));
+			if ($code === '' || strlen($code) !== 3 || $rate <= 0)
+			{
+				continue;
+			}
+			$rate_map[$code] = round($rate, 4);
+			if (($manuals[$index] ?? '') === 'Y')
+			{
+				$manual_map[$code] = 'Y';
+			}
+		}
+		return [$rate_map, $manual_map];
 	}
 
 	/**
