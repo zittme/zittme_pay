@@ -5,6 +5,7 @@ namespace Zittme\Modules\Zittme_pay\Controllers;
 use Zittme\Framework\Exceptions\TargetNotFound;
 use Zittme\Modules\Zittme_pay\Gateways\Base as Gateway;
 use Zittme\Modules\Zittme_pay\Models\Config as ConfigModel;
+use Zittme\Modules\Zittme_pay\Models\Currency;
 use Zittme\Modules\Zittme_pay\Models\Log;
 use Zittme\Modules\Zittme_pay\Models\Order;
 use Zittme\Modules\Zittme_pay\Models\Ticket;
@@ -13,13 +14,13 @@ use Zittme\Modules\Zittme_pay\PayService;
 /**
  * 결제 진행 — 결제 화면, 결제 시작, PG 콜백, 웹훅, 결과 화면.
  *
- * 이 파일에서 가장 중요한 규칙 
+ * 이 파일에서 가장 중요한 규칙
  *
  * procZittme_payCallback 과 procZittme_payWebhook 은 "세션 금지 구역" 이다.
  * PG 는 이 두 액션을 크로스사이트로 호출하므로 SameSite 정책상 세션 쿠키가 함께 오지 않는다.
  * 여기서 세션을 읽거나 쓰면 PHP 가 새 세션을 발급하고, 그 Set-Cookie 가 브라우저의 기존
  * 세션을 갈아치워 결제를 시작했던 창의 CSRF 토큰이 전부 무효화된다.
- * ("보안정책상 허용되지 않습니다 / ERR_CSRF_CHECK_FAILED" — pitfall #57)
+ * ("보안정책상 허용되지 않습니다 / ERR_CSRF_CHECK_FAILED")
  *
  * 그래서 두 액션은 $_SESSION 을 건드리지 않고, 상관관계와 결과 전달을 파일 티켓으로만 한다.
  * Context::get() 으로 요청 변수를 읽는 것은 안전하지만, 로그인 정보를 조회하거나
@@ -101,6 +102,9 @@ class Pay extends Base
 		}
 
 		\Context::set('order', $order);
+		// 금액 문구는 여기서 완성해 넘긴다. 스킨이 모델을 직접 부르면 컴파일 단계에서
+		// 네임스페이스 구분자가 유실돼 클래스를 못 찾는 일이 생긴다
+		\Context::set('amount_text', Currency::money($order->amount, $order->currency ?: 'KRW'));
 		\Context::set('source_order_code', self::sourceOrderCode($order));
 		\Context::set('pay_state', $state);
 		\Context::set('pay_config', $config);
@@ -232,7 +236,10 @@ class Pay extends Base
 		]);
 
 		$this->add('requires_client', false);
-		$this->setRedirectUrl(getNotEncodedUrl('', 'module', 'zittme_pay', 'act', 'dispZittme_payResult', 'pay_ticket', $state));
+		// 티켓과 주문번호를 함께 싣는다. 결제 도중 로그인 등으로 세션이 바뀌면
+		// 티켓 회수가 실패하는데, 주문번호가 없으면 되돌아갈 길이 없다
+		$this->setRedirectUrl(getNotEncodedUrl('', 'module', 'zittme_pay', 'act', 'dispZittme_payResult',
+			'pay_ticket', $state, 'order_code', $order->order_code));
 	}
 
 	/**
@@ -497,8 +504,21 @@ class Pay extends Base
 		}
 		if (!$order)
 		{
-			// 티켓 없이 들어온 경우(새로고침 등)에는 주문번호로 찾는다.
+			// 티켓 없이 들어온 경우(새로고침, 결제 도중 로그인 등)에는 주문번호로 찾는다.
 			$order = Order::getByCode((string)\Context::get('order_code'));
+
+			// 티켓을 거치지 않은 경로다. 회원 주문이면 본인만 볼 수 있게 한다.
+			// 비회원 주문은 확인할 것이 주문번호뿐이라 그대로 보여준다.
+			if ($order && (int)($order->member_srl ?? 0) > 0)
+			{
+				$viewer = \Context::get('logged_info');
+				$viewer_srl = (int)($viewer->member_srl ?? 0);
+				$is_admin = ($viewer->is_admin ?? '') === 'Y';
+				if (!$is_admin && $viewer_srl !== (int)$order->member_srl)
+				{
+					$order = null;
+				}
+			}
 		}
 		if (!$order)
 		{
@@ -506,6 +526,10 @@ class Pay extends Base
 		}
 
 		\Context::set('order', $order);
+		// 스킨이 모델을 직접 부르지 않도록 금액 문구를 여기서 완성한다
+		$result_currency = $order->currency ?: 'KRW';
+		\Context::set('amount_text', Currency::money($order->amount, $result_currency));
+		\Context::set('cancelled_amount_text', Currency::money($order->cancelled_amount ?? 0, $result_currency));
 		\Context::set('source_order_code', self::sourceOrderCode($order));
 		\Context::set('pay_config', self::config());
 		\Context::set('claim_result', $claimed);
@@ -561,7 +585,10 @@ class Pay extends Base
 			}
 			if ($stmt && $stmt->execute([$source_srl]))
 			{
-				return (string)($stmt->fetchColumn() ?: '');
+				// 코어는 버퍼링 없는 쿼리를 쓴다. 반환 전에 커서를 닫는다
+				$code = (string)($stmt->fetchColumn() ?: '');
+				$stmt->closeCursor();
+				return $code;
 			}
 		}
 		catch (\Throwable $e)

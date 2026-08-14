@@ -51,36 +51,57 @@
 			</div>
 		</div>
 
+		{{-- 공용 환율 - 행은 활성 통화(기준 설정의 추가 결제 통화 + 기준 통화가 KRW 가 아니면 기준 통화)로 자동 구성된다 --}}
+		{{-- 자동 갱신이 켜져 있으면 값은 API 가 채우고, 수동 고정을 켠 통화만 직접 입력한다 --}}
 		<h3>{{ $lang->zpay_exchange_rates }}</h3>
 
 		<div class="x_control-group">
 			<label class="x_control-label">{{ $lang->zpay_exchange_rates }}</label>
 			<div class="x_controls">
+				@php
+				$zfx_auto = ($pay_config->exchange_auto ?? 'N') === 'Y';
+				$zfx_names = \Zittme\Modules\Zittme_pay\Models\Currency::MAJOR_CURRENCIES;
+				$zfx_base = strtoupper((string)$pay_config->currency ?: 'KRW');
+				$zfx_active = is_array($pay_config->extra_currencies ?? null) ? $pay_config->extra_currencies : [];
+				@endphp
+				@if ($zfx_base !== 'KRW' && !in_array($zfx_base, $zfx_active, true))
+				@php $zfx_active[] = $zfx_base; @endphp
+				@endif
+				@if (!count($zfx_active))
+				<p class="x_help-block" style="margin:6px 0">{{ $lang->zpay_fx_no_active }}</p>
+				@else
 				<table class="x_table" id="zpay-fx-table">
 					<thead>
 						<tr>
-							<th style="width:120px">{{ $lang->zpay_fx_code }}</th>
+							<th style="width:190px">{{ $lang->zpay_fx_code }}</th>
 							<th>{{ $lang->zpay_fx_rate }}</th>
 							<th style="width:120px">{{ $lang->zpay_fx_manual }}</th>
 						</tr>
 					</thead>
 					<tbody>
-						@foreach($pay_config->exchange_rates as $fx_code => $fx_rate)
+						{{-- 체크박스는 체크된 것만 전송되므로, 줄마다 인덱스를 박아 통화·환율·수동고정을 짝지운다 --}}
+						@php $fx_i = 0; @endphp
+						@foreach($zfx_active as $fx_code)
+						@php $fx_manual_on = ($pay_config->exchange_rates_manual[$fx_code] ?? '') === 'Y'; @endphp
 						<tr>
-							<td><input type="text" name="fx_code[]" value="{{ $fx_code }}" maxlength="3" /></td>
-							<td><input type="text" name="fx_rate[]" value="{{ $fx_rate }}" /></td>
-							<td><label class="x_inline"><input type="checkbox" name="fx_manual[]" value="Y" @if (($pay_config->exchange_rates_manual[$fx_code] ?? '') === 'Y') checked @endif /> {{ $lang->zpay_fx_manual_short }}</label></td>
+							<td>
+								<input type="hidden" name="fx_code[{{ $fx_i }}]" value="{{ $fx_code }}" />
+								<strong>{{ $fx_code }}</strong> <span style="color:#8b95a1">{{ $zfx_names[$fx_code] ?? '' }}</span>
+							</td>
+							<td><input type="text" name="fx_rate[{{ $fx_i }}]" value="{{ $pay_config->exchange_rates[$fx_code] ?? '' }}" placeholder="{{ $zfx_auto ? $lang->zpay_fx_auto_ph : '1350' }}" @if ($zfx_auto && !$fx_manual_on) readonly style="background:rgba(128,128,128,.08)" @endif /></td>
+							<td><label class="x_inline"><input type="checkbox" name="fx_manual[{{ $fx_i }}]" value="Y" @if ($fx_manual_on) checked @endif onchange="var r=this.closest('tr').querySelector('[name^=fx_rate]'); r.readOnly={{ $zfx_auto ? '!this.checked' : 'false' }}; r.style.background=r.readOnly?'rgba(128,128,128,.08)':'';" /> {{ $lang->zpay_fx_manual_short }}</label></td>
 						</tr>
+						@php $fx_i++; @endphp
 						@endforeach
-						{{-- 항상 빈 줄을 하나 둬서 통화를 더 넣을 수 있게 한다. --}}
-						<tr>
-							<td><input type="text" name="fx_code[]" value="" maxlength="3" placeholder="USD" /></td>
-							<td><input type="text" name="fx_rate[]" value="" placeholder="1350" /></td>
-							<td><label class="x_inline"><input type="checkbox" name="fx_manual[]" value="Y" /> {{ $lang->zpay_fx_manual_short }}</label></td>
-						</tr>
 					</tbody>
 				</table>
-				<p class="x_help-block">{{ $lang->zpay_exchange_rates_help }}</p>
+				@endif
+				<p class="x_help-block">
+					{{ $lang->zpay_exchange_rates_help }}
+					@if ($zfx_auto && $pay_config->exchange_updated)
+					<br />{{ $lang->zpay_fx_updated }}: {{ zdate($pay_config->exchange_updated, 'Y-m-d H:i') }}
+					@endif
+				</p>
 			</div>
 		</div>
 
@@ -213,11 +234,22 @@
 			<label class="x_control-label" for="zpay_paypal_currency">{{ $lang->zpay_paypal_currency }}</label>
 			<div class="x_controls">
 				<select id="zpay_paypal_currency" name="paypal_currency">
-					@foreach (['USD', 'EUR', 'JPY', 'GBP', 'AUD', 'CAD', 'SGD', 'HKD', 'TWD', 'CNY'] as $zpay_cur)
+					@foreach ($paypal_currencies ?? [] as $zpay_cur)
 					<option value="{{ $zpay_cur }}" @if ($pay_config->paypal_currency === $zpay_cur) selected @endif>{{ $zpay_cur }}</option>
 					@endforeach
 				</select>
 				<p class="x_help-block">{{ $lang->zpay_paypal_currency_help }}</p>
+			</div>
+		</div>
+
+		<div class="x_control-group">
+			<label class="x_control-label">{{ $lang->zpay_paypal_allow_krw }}</label>
+			<div class="x_controls">
+				<label class="x_inline">
+					<input type="checkbox" name="paypal_allow_krw" value="Y" @if (($pay_config->paypal_allow_krw ?? 'N') === 'Y') checked @endif />
+					{{ $lang->zpay_paypal_allow_krw_label }}
+				</label>
+				<p class="x_help-block">{{ $lang->zpay_paypal_allow_krw_help }}</p>
 			</div>
 		</div>
 

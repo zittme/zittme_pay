@@ -20,12 +20,12 @@ class Install extends Base
 	 * 스키마에 칼럼을 추가할 때는 반드시 이 표에도 같이 적을 것.
 	 */
 	public const ADDED_COLUMNS = [
-		// 0.1.1 — 구매확정과 수동 환불 (docs/PAY-MODULE.md 8항)
+		// 구매확정과 수동 환불 (docs/PAY-MODULE.md 8항)
 		['zittme_pay_order', 'confirm_date', 'char', 14],
 		['zittme_pay_order', 'refund_state', 'varchar', 20],
 		['zittme_pay_order', 'refund_amount', 'bigint', null],
 		['zittme_pay_order', 'refund_date', 'char', 14],
-		// 0.1.2 — 출처 모듈의 주문번호 (사용자 대표 번호, 결제번호는 내부용)
+		// 출처 모듈의 주문번호 (사용자 대표 번호, 결제번호는 내부용)
 		['zittme_pay_order', 'source_code', 'varchar', 80],
 	];
 

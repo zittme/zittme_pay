@@ -90,7 +90,7 @@
 		</tbody>
 	</table>
 
-	{{-- 페이지네이션은 코어가 HTML 을 만들어 주지 않으므로 직접 그린다 (pitfall #43). --}}
+	{{-- 페이지네이션은 코어가 HTML 을 만들어 주지 않으므로 직접 그린다. --}}
 	@if($total_page > 1)
 	<div class="x_page-navigation">
 		@foreach($page_navigation as $page_no)

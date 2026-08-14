@@ -1,6 +1,6 @@
 <?php
 
-$lang->zittme_pay = '짓미ペイ';
+$lang->zittme_pay = 'Zittme ペイ';
 
 // 管理者タブ
 $lang->zpay_tab_config = '基本';
@@ -45,6 +45,8 @@ $lang->zpay_paypal_exchange_rate = '適用為替レート';
 $lang->zpay_paypal_exchange_rate_help = '決済通貨1単位あたりのKRWです。例: USDなら1350。返金は決済時のレートで処理されます。';
 $lang->zpay_exchange_rates = '共通為替レート';
 $lang->zpay_exchange_rates_help = '各通貨1単位あたりのKRWです。決済換算とコマースの多通貨価格が共に参照します。注文には決済時のレートが保存されます。';
+$lang->zpay_fx_no_active = 'No additional currencies. Select currencies in Basic settings and rate rows appear here automatically.';
+$lang->zpay_fx_auto_ph = 'Auto updated';
 $lang->zpay_fx_code = '通貨コード';
 $lang->zpay_fx_rate = 'レート (KRW)';
 $lang->zpay_fx_manual = '手動固定';
@@ -64,6 +66,9 @@ $lang->zpay_enabled_help = 'オフにすると新しい決済を受け付けま�
 $lang->zpay_test_mode = 'テストモード';
 $lang->zpay_test_mode_help = 'PG のテストキーを使用中であることを示します。実際の決済は行われません。';
 $lang->zpay_currency = '決済通貨';
+$lang->zpay_currency_help = 'The base currency for the whole site. Product prices, payments, credits, and statistics all use this currency. Example: KRW, USD, MXN. Only gateways that support it appear at checkout.';
+$lang->zpay_extra_currencies = 'Additional currencies';
+$lang->zpay_extra_currencies_help = 'Currencies allowed for parallel display and payment besides the base currency. Converted via the shared exchange rates (auto update recommended); per-currency item prices take priority. Coupons and credits work only on base-currency orders.';
 $lang->zpay_order_prefix = '注文番号の接頭辞';
 $lang->zpay_order_prefix_help = 'PG 管理画面で自社の注文を見分けるための表示です。英数字 8 文字以内。';
 
@@ -147,6 +152,7 @@ $lang->zpay_total_orders = '全 %s 件';
 $lang->zpay_no_orders = '決済履歴がありません。';
 $lang->zpay_filter_all_status = 'すべての状態';
 $lang->zpay_confirm_deposit = '入金を確認';
+$lang->zpay_confirm_deposit_ask = '入金を確認しましたか。確認処理を行うと決済完了に変わります。';
 $lang->zpay_confirm_deposit_help = '通帳で入金を確認してから押してください。押した時点で決済完了として処理され、要求元のモジュールに通知されます。';
 $lang->zpay_cancel_payment = '決済をキャンセル';
 $lang->zpay_cancel_amount = 'キャンセル金額';
@@ -237,3 +243,6 @@ $lang->msg_force_cancel_disabled = '確定分の強制キャンセルは許可�
 $lang->msg_cancel_manual_refund_queued = 'キャンセルされました。この決済手段は自動返金ができないため、管理者が直接送金する必要があります。';
 $lang->msg_no_pending_refund = '送金待ちの返金はありません。';
 $lang->msg_refund_completed = '送金完了として記録しました。';
+$lang->zpay_paypal_allow_krw = 'ウォン建て注文の換算決済';
+$lang->zpay_paypal_allow_krw_label = 'ウォン建て注文もペイパルで決済できるようにする';
+$lang->zpay_paypal_allow_krw_help = 'ペイパルはウォンでの精算に対応していません。この項目をオンにすると、ウォン建て注文を上で選んだ決済通貨に換算して送ります。購入者には外貨の決済画面が表示され、返金時のレートによって実際の返金額が注文金額と異なる場合があります。海外販売をされるなら、商品自体を外貨で販売する方をおすすめします。為替レートの設定が必要です。';

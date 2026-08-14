@@ -5,21 +5,20 @@ namespace Zittme\Modules\Zittme_pay\Models;
 /**
  * 결제 콜백용 티켓 저장소 — 세션 무의존.
  *
- * 이 클래스가 존재하는 이유 (pitfall #57)
+ * 세션을 쓰지 않는 이유
  *
  * PG 는 결제 결과를 브라우저를 통해 우리 사이트로 크로스사이트 POST 한다. 그때 SameSite
  * 정책 때문에 세션 쿠키가 함께 오지 않는다. 콜백 핸들러가 세션을 건드리면 PHP 가 세션이
  * 없다고 판단해 새 세션을 발급하고, 그 Set-Cookie 가 브라우저의 기존 세션을 갈아치운다.
  * 그러면 결제를 시작했던 원래 창의 CSRF 토큰이 죽은 세션 소속이 되어, 이후 어떤 폼을 내도
  * "보안정책상 허용되지 않습니다(ERR_CSRF_CHECK_FAILED)" 가 뜬다.
- * 다날 본인인증에서 실제로 겪었고, 결제에서는 100% 재발한다.
  *
  * 그래서 콜백은 세션을 절대 읽거나 쓰지 않는다. 대신
  *   1) 결제 시작 시 랜덤 state 를 발급해 서버 파일에 저장한다 (발급 브라우저 지문 포함)
  *   2) 콜백은 state 로 주문을 찾고, 승인 결과를 그 파일에 적기만 한다
  *   3) 브라우저가 ?pay_ticket=... 로 돌아오면 원래 세션에서 1회용으로 claim 한다
  *
- * 구현은 modules/member/identity/Base.php 의 티켓 패턴을 그대로 따랐다.
+ * modules/member/identity/Base.php 의 티켓 패턴과 같다.
  */
 class Ticket
 {

@@ -15,7 +15,7 @@
 	<actions>
 		<!--
 		  결제 화면은 요청자 모듈(커머스·예약)이 발급한 결제 URL 로 바로 열린다.
-		  그 URL 에는 mid 가 없으므로 standalone="true" 로 둔다. (pitfall #52 — standalone 값과
+		  그 URL 에는 mid 가 없으므로 standalone="true" 로 둔다. (standalone 값과
 		  링크의 mid 포함 여부는 항상 짝을 맞춘다.)
 		-->
 		<action name="dispZittme_payCheckout" class="Controllers\Pay" standalone="true" />
@@ -23,11 +23,11 @@
 		<action name="procZittme_payReady" class="Controllers\Pay" standalone="true" />
 
 		<!--
-		  ★ 세션 금지 구역.
+		  세션 금지 구역.
 		  PG 가 크로스사이트로 POST 하므로 SameSite 세션쿠키가 오지 않는다. 세션을 건드리면
-		  PHP 가 새 세션을 발급해 원래 창의 CSRF 토큰이 무효화된다 (pitfall #57).
+		  PHP 가 새 세션을 발급해 원래 창의 CSRF 토큰이 무효화된다.
 		  그래서 check-csrf="false" 로 코어 검사를 끄고, state 티켓과 금액 대조로 자체 검증한다.
-		  ⚠️ 속성 이름은 check-csrf (하이픈) 다. check_csrf 로 적으면 파서가 무시해서
+		  주의: 속성 이름은 check-csrf (하이픈) 다. check_csrf 로 적으면 파서가 무시해서
 		     CSRF 검사가 그대로 켜진 채 콜백이 막힌다.
 		-->
 		<action name="procZittme_payCallback" class="Controllers\Pay" standalone="true" check-csrf="false" />

@@ -27,6 +27,17 @@ class Banktransfer extends Base
 	}
 
 	/**
+	 * PG 가 없으니 통화 제약도 없다. 어느 통화 주문이든 계좌 입금으로 받는다.
+	 *
+	 * @param string $currency
+	 * @return bool
+	 */
+	public function supportsCurrency(string $currency): bool
+	{
+		return true;
+	}
+
+	/**
 	 * 입금받을 계좌가 하나라도 등록돼 있어야 쓸 수 있다.
 	 *
 	 * @return bool

@@ -42,16 +42,16 @@
 			@endif
 			<div class="zpay-summary-row">
 				<dt>{{ $lang->zpay_product }}</dt>
-				<dd>{{ $order->title }}</dd>
+				<dd>{{ Context::replaceUserLang((string)$order->title) }}</dd>
 			</div>
 			<div class="zpay-summary-row zpay-summary-total">
 				<dt>{{ $lang->zpay_amount }}</dt>
-				<dd><strong>{{ \Zittme\Modules\Zittme_pay\Models\Currency::money($order->amount, $order->currency ?? 'KRW') }}</strong></dd>
+				<dd><strong>{{ $amount_text }}</strong></dd>
 			</div>
 			@if($order->cancelled_amount > 0)
 			<div class="zpay-summary-row">
 				<dt>{{ $lang->zpay_cancelled_amount }}</dt>
-				<dd>{{ \Zittme\Modules\Zittme_pay\Models\Currency::money($order->cancelled_amount, $order->currency ?? 'KRW') }}</dd>
+				<dd>{{ $cancelled_amount_text }}</dd>
 			</div>
 			@endif
 		</dl>

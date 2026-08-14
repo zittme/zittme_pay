@@ -25,17 +25,59 @@ class Currency
 
 	/**
 	 * 통화 기호. 없으면 코드 그대로 보여준다.
+	 *
+	 * 달러 기호를 쓰는 통화는 코드로 적는다. 현지에서 $ 는 자국 화폐를 뜻하고
+	 * 구분이 필요할 때 코드를 덧붙이므로, MX$ 같은 표기는 그 나라에서 쓰지 않는다.
+	 * 목록에 없는 통화는 format() 이 '코드 + 공백' 으로 처리한다.
 	 */
 	public const SYMBOLS = [
-		'KRW' => '₩', 'USD' => '$', 'EUR' => '€', 'JPY' => '¥', 'GBP' => '£',
-		'CNY' => '¥', 'TWD' => 'NT$', 'HKD' => 'HK$', 'AUD' => 'A$', 'CAD' => 'C$',
-		'SGD' => 'S$',
+		'KRW' => '₩', 'EUR' => '€', 'JPY' => '¥', 'GBP' => '£', 'CNY' => '¥',
+		'THB' => '฿', 'PHP' => '₱', 'VND' => '₫', 'IDR' => 'Rp', 'INR' => '₹',
 	];
 
 	/**
 	 * 자동 갱신을 지원하는 출처.
 	 */
 	public const SOURCES = ['erapi', 'koreaexim'];
+
+	/**
+	 * 기준 통화 선택지 — 결제에 흔히 쓰는 대표 통화.
+	 * 코드 => 한글 이름. 관리자 기본 설정의 결제 통화 셀렉트가 쓴다.
+	 */
+	public const MAJOR_CURRENCIES = [
+		'KRW' => '대한민국 원',
+		'USD' => '미국 달러',
+		'EUR' => '유로',
+		'JPY' => '일본 엔',
+		'CNY' => '중국 위안',
+		'GBP' => '영국 파운드',
+		'AUD' => '호주 달러',
+		'CAD' => '캐나다 달러',
+		'CHF' => '스위스 프랑',
+		'HKD' => '홍콩 달러',
+		'SGD' => '싱가포르 달러',
+		'TWD' => '대만 달러',
+		'THB' => '태국 바트',
+		'VND' => '베트남 동',
+		'PHP' => '필리핀 페소',
+		'IDR' => '인도네시아 루피아',
+		'MYR' => '말레이시아 링깃',
+		'INR' => '인도 루피',
+		'MXN' => '멕시코 페소',
+		'BRL' => '브라질 헤알',
+		'NZD' => '뉴질랜드 달러',
+		'SEK' => '스웨덴 크로나',
+		'NOK' => '노르웨이 크로네',
+		'DKK' => '덴마크 크로네',
+		'PLN' => '폴란드 즈워티',
+		'CZK' => '체코 코루나',
+		'HUF' => '헝가리 포린트',
+		'AED' => '아랍에미리트 디르함',
+		'SAR' => '사우디 리얄',
+		'ILS' => '이스라엘 셰켈',
+		'TRY' => '튀르키예 리라',
+		'ZAR' => '남아공 랜드',
+	];
 
 	/**
 	 * 1 통화당 KRW 환율. 모르는 통화면 0.
@@ -251,9 +293,17 @@ class Currency
 
 		$rates = is_array($config->exchange_rates) ? $config->exchange_rates : [];
 		$manual = is_array($config->exchange_rates_manual ?? null) ? $config->exchange_rates_manual : [];
+		// 활성 통화만 갱신한다 - 전체 통화를 다 담으면 설정만 비대해진다
+		$active = is_array($config->extra_currencies ?? null) ? $config->extra_currencies : [];
+		$base = strtoupper((string)($config->currency ?? '')) ?: 'KRW';
+		if ($base !== 'KRW')
+		{
+			$active[] = $base;
+		}
+		$active = array_unique(array_merge($active, array_keys($rates)));
 		foreach ($fetched as $code => $rate)
 		{
-			if (($manual[$code] ?? 'N') === 'Y')
+			if (!in_array($code, $active, true) || ($manual[$code] ?? 'N') === 'Y')
 			{
 				continue;
 			}

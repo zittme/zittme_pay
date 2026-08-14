@@ -348,14 +348,28 @@ class Paypal extends Base
 	];
 
 	/**
-	 * KRW 는 환율이 있어야 환산 결제가 되고, 외화 주문은 지원 통화면 그대로 결제한다.
+	 * 관리 화면의 결제 통화 목록.
+	 *
+	 * @return array<int, string>
+	 */
+	public static function currencyChoices(): array
+	{
+		return self::SUPPORTED_CURRENCIES;
+	}
+
+	/**
+	 * 페이팔이 받는 통화의 주문에만 결제수단으로 오른다.
+	 *
+	 * KRW 는 페이팔이 정산하지 않는 통화다. 환율로 환산해 보낼 수는 있으나
+	 * 원화로 주문한 구매자에게 외화 결제창이 뜨고 환불 때 환율이 어긋나므로
+	 * 기본값은 꺼 둔다. 해외 결제는 주문 통화를 외화로 받는 쪽이 안전하다.
 	 */
 	public function supportsCurrency(string $currency): bool
 	{
 		$currency = strtoupper($currency);
 		if ($currency === 'KRW')
 		{
-			return $this->exchangeRate() > 0;
+			return ($this->config->paypal_allow_krw ?? 'N') === 'Y' && $this->exchangeRate() > 0;
 		}
 		return in_array($currency, self::SUPPORTED_CURRENCIES, true);
 	}

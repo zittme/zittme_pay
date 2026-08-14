@@ -25,7 +25,7 @@ class Admin extends Base
 	 */
 	public const TAB_FIELDS = [
 		'config' => [
-			'enabled', 'test_mode', 'currency', 'order_prefix',
+			'enabled', 'test_mode', 'currency', 'extra_currencies', 'order_prefix',
 			'allow_partial_cancel', 'cancel_reasons', 'auto_cancel_days', 'allow_force_cancel',
 			'notify_admin_email', 'notify_on_paid', 'notify_on_cancel',
 			'log_retention_days', 'webhook_ip_whitelist', 'biz_notice',
@@ -36,7 +36,7 @@ class Admin extends Base
 			'kcp_site_cd', 'kcp_cert_info', 'kcp_priv_key', 'kcp_priv_pass',
 			'nicepay_client_id', 'nicepay_secret_key',
 			'portone_store_id', 'portone_channel_key', 'portone_api_secret',
-			'paypal_client_id', 'paypal_secret', 'paypal_currency', 'paypal_exchange_rate',
+			'paypal_client_id', 'paypal_secret', 'paypal_currency', 'paypal_exchange_rate', 'paypal_allow_krw',
 			'exchange_rates', 'exchange_rates_manual', 'exchange_auto', 'exchange_source', 'exchange_api_key',
 			'bank_accounts', 'bank_due_days',
 		],
@@ -47,7 +47,7 @@ class Admin extends Base
 	 */
 	protected const BOOLEAN_FIELDS = [
 		'enabled', 'test_mode', 'allow_partial_cancel', 'notify_on_paid', 'notify_on_cancel',
-		'allow_force_cancel', 'exchange_auto',
+		'allow_force_cancel', 'exchange_auto', 'paypal_allow_krw',
 	];
 
 	/**
@@ -144,6 +144,8 @@ class Admin extends Base
 		}
 
 		\Context::set('drivers', $drivers);
+		// 결제 통화 목록은 드라이버가 들고 있는 값을 그대로 쓴다 (화면에 따로 적어 두면 어긋난다)
+		\Context::set('paypal_currencies', \Zittme\Modules\Zittme_pay\Gateways\Drivers\Paypal::currencyChoices());
 		\Context::set('webhook_url', Gateway::buildActionUrl('procZittme_payWebhook'));
 		$this->setTemplateFile('gateway');
 	}
@@ -194,7 +196,7 @@ class Admin extends Base
 		\Context::set('total_count', $output->total_count);
 		\Context::set('total_page', $output->total_page);
 		\Context::set('page', $output->page);
-		// 템플릿이 직접 그린다. PageHandler 에는 HTML 을 만들어 주는 메서드가 없다 (pitfall #43).
+		// 템플릿이 직접 그린다. PageHandler 에는 HTML 을 만들어 주는 메서드가 없다.
 		\Context::set('page_navigation', $output->page_navigation);
 		\Context::set('search_target', $search_target);
 		\Context::set('search_keyword', $search_keyword);
@@ -547,7 +549,24 @@ class Admin extends Base
 		if ($key === 'currency')
 		{
 			$currency = strtoupper(preg_replace('/[^A-Za-z]/', '', (string)$value));
-			return $currency !== '' ? substr($currency, 0, 8) : 'KRW';
+			return isset(\Zittme\Modules\Zittme_pay\Models\Currency::MAJOR_CURRENCIES[$currency]) ? $currency : 'KRW';
+		}
+
+		if ($key === 'extra_currencies')
+		{
+			// 대표 통화 안에서만 고른다. 기준 통화는 항상 포함이므로 뺀다.
+			$base = strtoupper(preg_replace('/[^A-Za-z]/', '', (string)($vars->currency ?? '')));
+			$codes = [];
+			foreach ((array)$value as $code)
+			{
+				$code = strtoupper(trim((string)$code));
+				if (isset(\Zittme\Modules\Zittme_pay\Models\Currency::MAJOR_CURRENCIES[$code])
+					&& $code !== $base && !in_array($code, $codes, true))
+				{
+					$codes[] = $code;
+				}
+			}
+			return $codes;
 		}
 
 		if ($key === 'order_prefix')

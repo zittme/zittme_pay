@@ -33,7 +33,36 @@
 		<div class="x_control-group">
 			<label class="x_control-label" for="zpay_currency">{{ $lang->zpay_currency }}</label>
 			<div class="x_controls">
-				<input type="text" id="zpay_currency" name="currency" value="{{ $pay_config->currency }}" maxlength="8" />
+				<select id="zpay_currency" name="currency">
+					@foreach (\Zittme\Modules\Zittme_pay\Models\Currency::MAJOR_CURRENCIES as $zpc_code => $zpc_name)
+					<option value="{{ $zpc_code }}" @if (strtoupper((string)$pay_config->currency ?: 'KRW') === $zpc_code) selected @endif>{{ $zpc_code }} - {{ $zpc_name }}</option>
+					@endforeach
+					@if (!isset(\Zittme\Modules\Zittme_pay\Models\Currency::MAJOR_CURRENCIES[strtoupper((string)$pay_config->currency ?: 'KRW')]))
+					<option value="{{ strtoupper((string)$pay_config->currency) }}" selected>{{ strtoupper((string)$pay_config->currency) }}</option>
+					@endif
+				</select>
+				<p class="x_help-block">{{ $lang->zpay_currency_help }}</p>
+			</div>
+		</div>
+
+		<div class="x_control-group">
+			<label class="x_control-label">{{ $lang->zpay_extra_currencies }}</label>
+			<div class="x_controls">
+				@php
+					$zpc_base = strtoupper((string)$pay_config->currency ?: 'KRW');
+					$zpc_extra = is_array($pay_config->extra_currencies ?? null) ? $pay_config->extra_currencies : [];
+				@endphp
+				<div style="display:flex;flex-wrap:wrap;gap:6px 14px;max-width:720px">
+					@foreach (\Zittme\Modules\Zittme_pay\Models\Currency::MAJOR_CURRENCIES as $zpc_code => $zpc_name)
+					@if ($zpc_code !== $zpc_base)
+					<label class="x_inline" style="font-weight:400">
+						<input type="checkbox" name="extra_currencies[]" value="{{ $zpc_code }}" @if (in_array($zpc_code, $zpc_extra, true)) checked @endif />
+						{{ $zpc_code }} <span style="color:#8b95a1">{{ $zpc_name }}</span>
+					</label>
+					@endif
+					@endforeach
+				</div>
+				<p class="x_help-block">{{ $lang->zpay_extra_currencies_help }}</p>
 			</div>
 		</div>
 

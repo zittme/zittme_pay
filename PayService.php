@@ -170,7 +170,7 @@ class PayService
 	 * 결제 페이지 주소.
 	 *
 	 * 이 주소에는 mid 가 없다. 그래서 dispZittme_payCheckout 은 standalone="true" 다
-	 * (pitfall #52 — standalone 값과 링크의 mid 포함 여부는 항상 짝을 맞춘다).
+	 * (standalone 값과 링크의 mid 포함 여부는 항상 짝을 맞춘다).
 	 *
 	 * @param string $order_code
 	 * @return string

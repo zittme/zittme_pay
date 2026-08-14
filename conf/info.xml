@@ -24,8 +24,8 @@
 	<description xml:lang="fr">Moteur de paiement partagé. Les modules demandeurs (boutique, réservation) enregistrent une commande et ce module gère la fenêtre de paiement, la validation côté serveur, les annulations et les remboursements.</description>
 	<description xml:lang="de">Gemeinsame Zahlungs-Engine. Anfragende Module wie Shop oder Reservierung legen eine Bestellung an; dieses Modul übernimmt Zahlungsfenster, serverseitige Freigabe sowie Stornierung und Rückerstattung.</description>
 	<description xml:lang="tr">Ortak kullanılan ödeme motoru. Ticaret veya rezervasyon gibi talep eden modüller bir sipariş kaydeder; ödeme penceresi, sunucu tarafı onay, iptal ve iade işlemlerini bu modül yürütür.</description>
-	<version>0.2.0</version>
-	<date>2026-08-12</date>
+	<version>0.2.2</version>
+	<date>2026-08-14</date>
 	<category>service</category>
 	<author email_address="zittme-contact@zzan.me" link="https://zitt.me">
 		<name xml:lang="ko">ZZAN Studio</name>

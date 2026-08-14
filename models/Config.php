@@ -22,6 +22,8 @@ class Config
 		// Y 면 PG 의 테스트 키·테스트 엔드포인트를 쓴다. 실결제가 일어나지 않는다.
 		'test_mode' => 'Y',
 		'currency' => 'KRW',
+		// 추가 결제 통화 — 기준 통화 외에 병행 표시·결제를 허용할 통화 (교차 환율 사용).
+		'extra_currencies' => [],
 		// 주문번호 접두사. PG 관리자에서 우리 주문을 알아보는 용도.
 		'order_prefix' => 'ZP',
 
@@ -122,8 +124,8 @@ class Config
 				}
 			}
 
-			// 배열로 쓰는 값이 문자열로 저장돼 있으면 이후 foreach 가 죽는다. 여기서 바로잡는다.
-			foreach (['enabled_gateways', 'bank_accounts', 'exchange_rates', 'exchange_rates_manual'] as $key)
+			// 배열로 쓰는 값은 문자열로 저장돼 있어도 배열로 정규화한다.
+			foreach (['enabled_gateways', 'bank_accounts', 'exchange_rates', 'exchange_rates_manual', 'extra_currencies'] as $key)
 			{
 				if (!is_array($config->{$key}))
 				{

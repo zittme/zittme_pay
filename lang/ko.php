@@ -45,6 +45,8 @@ $lang->zpay_paypal_exchange_rate = '적용 환율';
 $lang->zpay_paypal_exchange_rate_help = '결제 통화 1단위당 원화 금액입니다. 예: USD 기준 1350. 환불은 결제 당시 환율로 처리되며, 환율 변동 차액은 상점이 부담합니다.';
 $lang->zpay_exchange_rates = '공용 환율';
 $lang->zpay_exchange_rates_help = '1 통화당 원화 금액입니다. 짓미페이 결제 환산과 커머스 다통화 가격이 함께 참조합니다. 주문에는 결제 시점 환율이 저장됩니다.';
+$lang->zpay_fx_no_active = '추가 결제 통화가 없습니다. 기본 설정에서 통화를 선택하면 여기에 환율 행이 자동으로 나타납니다.';
+$lang->zpay_fx_auto_ph = '자동 갱신됨';
 $lang->zpay_fx_code = '통화 코드';
 $lang->zpay_fx_rate = '환율 (KRW)';
 $lang->zpay_fx_manual = '수동 고정';
@@ -64,6 +66,9 @@ $lang->zpay_enabled_help = '끄면 새로운 결제를 받지 않습니다.';
 $lang->zpay_test_mode = '테스트 모드';
 $lang->zpay_test_mode_help = 'PG 가 발급한 테스트 키를 쓰는 중임을 표시합니다. 실제 결제가 일어나지 않습니다.';
 $lang->zpay_currency = '결제 통화';
+$lang->zpay_currency_help = '사이트 전체의 기준 통화입니다. 상품 가격 입력, 결제, 적립금, 통계가 전부 이 통화로 움직입니다. 예: KRW, USD, MXN. 이 통화를 지원하는 결제수단만 결제 화면에 나타납니다.';
+$lang->zpay_extra_currencies = '추가 결제 통화';
+$lang->zpay_extra_currencies_help = '기준 통화 외에 병행 표시·결제를 허용할 통화입니다. 결제수단 탭의 공용 환율(자동 갱신 권장)로 교차 환산하며, 상품에 통화별 가격을 직접 등록하면 그 값이 우선합니다. 쿠폰·적립금은 기준 통화 주문에서만 쓸 수 있습니다.';
 $lang->zpay_order_prefix = '주문번호 접두사';
 $lang->zpay_order_prefix_help = 'PG 관리자에서 우리 주문을 알아보기 위한 표시입니다. 영문·숫자 8자 이내.';
 
@@ -118,7 +123,7 @@ $lang->zpay_amount = '결제 금액';
 $lang->zpay_select_method = '결제수단 선택';
 $lang->zpay_depositor_name = '입금자명';
 $lang->zpay_bank_due_notice = '주문 후 %d일 이내에 입금해 주세요. 기한이 지나면 주문이 자동으로 취소됩니다.';
-$lang->zpay_pay_button = '%s원 결제하기';
+$lang->zpay_pay_button = '%s 결제하기';
 
 // 결제 결과
 $lang->zpay_result_paid = '결제가 완료되었습니다';
@@ -238,3 +243,6 @@ $lang->msg_force_cancel_disabled = '확정 건 강제취소가 허용되어 있�
 $lang->msg_cancel_manual_refund_queued = '취소되었습니다. 이 결제수단은 자동 환불이 불가능하므로 관리자가 직접 송금해야 합니다.';
 $lang->msg_no_pending_refund = '송금 대기 중인 환불이 없습니다.';
 $lang->msg_refund_completed = '송금 완료로 기록했습니다.';
+$lang->zpay_paypal_allow_krw = '원화 주문 환산 결제';
+$lang->zpay_paypal_allow_krw_label = '원화 주문도 페이팔로 결제할 수 있게 한다';
+$lang->zpay_paypal_allow_krw_help = '페이팔은 원화를 정산하지 않습니다. 이 항목을 켜면 원화 주문을 위에서 고른 결제 통화로 환산해 보냅니다. 구매자에게는 외화 결제창이 뜨고, 환불 시점의 환율에 따라 실제 반환액이 주문 금액과 달라질 수 있습니다. 해외 판매를 하신다면 상품 자체를 외화로 파는 쪽을 권합니다. 환율이 설정되어 있어야 동작합니다.';

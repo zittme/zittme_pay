@@ -34,10 +34,8 @@ class Base extends \ModuleObject
 	/**
 	 * 공통 초기화.
 	 *
-	 * 하는 일은 없지만 반드시 있어야 한다. 코어의 \ModuleObject 에는 init() 이 없어서,
-	 * 하위 컨트롤러가 자기 init() 안에서 parent::init() 을 부르면
-	 * "Call to undefined method ...\Controllers\Base::init()" 로 죽는다.
-	 * 여기서 한 번 받아 주면 하위 컨트롤러는 안심하고 parent::init() 을 부를 수 있다.
+	 * 코어의 \ModuleObject 에는 init() 이 없다. 하위 컨트롤러가 parent::init() 을
+	 * 부를 수 있도록 빈 구현을 둔다.
 	 *
 	 * @return void
 	 */
