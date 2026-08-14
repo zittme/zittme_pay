@@ -33,6 +33,10 @@ class Currency
 	public const SYMBOLS = [
 		'KRW' => '₩', 'EUR' => '€', 'JPY' => '¥', 'GBP' => '£', 'CNY' => '¥',
 		'THB' => '฿', 'PHP' => '₱', 'VND' => '₫', 'IDR' => 'Rp', 'INR' => '₹',
+		// 달러를 쓰는 나라는 기호만으로 가려지지 않아 코드를 앞에 둔다
+		'USD' => '$', 'MXN' => 'MXN $', 'HKD' => 'HKD $', 'TWD' => 'TWD $',
+		'AUD' => 'AUD $', 'CAD' => 'CAD $', 'SGD' => 'SGD $', 'NZD' => 'NZD $',
+		'BRL' => 'R$',
 	];
 
 	/**
