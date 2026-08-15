@@ -125,6 +125,9 @@
 
 		<h3>{{ $lang->gateway_inicis }}</h3>
 
+		{{-- 테스트/운영 주소가 갈리는 대행사다. 키가 이 모드의 것이 아니면 인증부터 실패한다 --}}
+		<p class="zpay-mode @if ($pay_config->test_mode === 'Y') is-test @endif">{{ $pay_config->test_mode === 'Y' ? $lang->paypal_mode_sandbox : $lang->paypal_mode_live }}</p>
+
 		<div class="x_control-group">
 			<label class="x_control-label" for="zpay_inicis_mid">{{ $lang->zpay_inicis_mid }}</label>
 			<div class="x_controls">
@@ -148,6 +151,8 @@
 		</div>
 
 		<h3>{{ $lang->gateway_kcp }}</h3>
+
+		<p class="zpay-mode @if ($pay_config->test_mode === 'Y') is-test @endif">{{ $pay_config->test_mode === 'Y' ? $lang->paypal_mode_sandbox : $lang->paypal_mode_live }}</p>
 
 		<div class="x_control-group">
 			<label class="x_control-label" for="zpay_kcp_site_cd">{{ $lang->zpay_kcp_site_cd }}</label>
@@ -173,6 +178,8 @@
 		</div>
 
 		<h3>{{ $lang->gateway_nicepay }}</h3>
+
+		<p class="zpay-mode @if ($pay_config->test_mode === 'Y') is-test @endif">{{ $pay_config->test_mode === 'Y' ? $lang->paypal_mode_sandbox : $lang->paypal_mode_live }}</p>
 
 		<div class="x_control-group">
 			<label class="x_control-label" for="zpay_nicepay_client_id">{{ $lang->zpay_nicepay_client_id }}</label>
@@ -216,6 +223,16 @@
 		<h3>{{ $lang->gateway_paypal }}</h3>
 
 		<div class="x_control-group">
+			<label class="x_control-label">{{ $lang->zpay_paypal_mode }}</label>
+			<div class="x_controls">
+				<p class="zpay-mode @if ($pay_config->test_mode === 'Y') is-test @endif">
+					{{ $pay_config->test_mode === 'Y' ? $lang->paypal_mode_sandbox : $lang->paypal_mode_live }}
+				</p>
+				<p class="x_help-block">{{ $lang->zpay_paypal_mode_help }}</p>
+			</div>
+		</div>
+
+		<div class="x_control-group">
 			<label class="x_control-label" for="zpay_paypal_client_id">{{ $lang->zpay_paypal_client_id }}</label>
 			<div class="x_controls">
 				<input type="text" id="zpay_paypal_client_id" name="paypal_client_id" value="{{ $pay_config->paypal_client_id }}" class="x_full-width" autocomplete="off" />
@@ -227,6 +244,7 @@
 			<div class="x_controls">
 				<input type="password" id="zpay_paypal_secret" name="paypal_secret" value="{{ $pay_config->paypal_secret }}" class="x_full-width" autocomplete="off" />
 				<p class="x_help-block">{{ $lang->zpay_paypal_key_help }}</p>
+				<p><button type="button" class="x_btn" id="zpayPaypalTest">{{ $lang->zpay_paypal_test }}</button></p>
 			</div>
 		</div>
 
@@ -313,3 +331,31 @@
 		</div>
 	</form>
 </section>
+
+<style>
+.zpay-mode { display: inline-block; margin: 0; padding: 5px 12px; border-radius: 999px; background: rgba(38,119,227,.1); color: #2677e3; font-size: 13px; font-weight: 700; }
+.zpay-mode.is-test { background: rgba(234,152,8,.14); color: #a06a08; }
+</style>
+
+<script>
+(function () {
+	var btn = document.getElementById('zpayPaypalTest');
+	if (!btn) return;
+	btn.addEventListener('click', function () {
+		var label = btn.textContent;
+		btn.textContent = {!! json_encode($lang->zpay_paypal_testing) !!};
+		btn.disabled = true;
+		exec_json('zittme_pay.procZittme_payAdminTestPaypal', {
+			paypal_client_id: document.getElementById('zpay_paypal_client_id').value,
+			paypal_secret: document.getElementById('zpay_paypal_secret').value
+		}, function (ret) {
+			alert(ret.message);
+		}, function (ret) {
+			alert(ret.message);
+		}).always(function () {
+			btn.textContent = label;
+			btn.disabled = false;
+		});
+	});
+})();
+</script>

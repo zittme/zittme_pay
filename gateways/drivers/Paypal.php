@@ -443,7 +443,7 @@ class Paypal extends Base
 		$token = $this->accessToken();
 		if ($token === '')
 		{
-			return [false, 0, lang('zittme_pay.msg_pg_unreachable'), []];
+			return [false, 0, self::$_token_error !== '' ? self::$_token_error : lang('zittme_pay.msg_pg_unreachable'), []];
 		}
 
 		return $this->request($this->apiBase() . $path, $method, $data, [
@@ -463,7 +463,7 @@ class Paypal extends Base
 		}
 
 		$auth = base64_encode(trim((string)$this->config->paypal_client_id) . ':' . trim((string)$this->config->paypal_secret));
-		[$ok, , , $parsed] = $this->request(
+		[$ok, $status, $body, $parsed] = $this->request(
 			$this->apiBase() . '/v1/oauth2/token',
 			'POST',
 			['grant_type' => 'client_credentials'],
@@ -472,11 +472,59 @@ class Paypal extends Base
 
 		if (!$ok || empty($parsed['access_token']))
 		{
+			// 실패 이유를 남겨 둔다. 남기지 않으면 운영자가 원인을 알 방법이 없다
+			self::$_token_error = self::tokenErrorMessage($status, $parsed, $body);
 			return '';
 		}
 
+		self::$_token_error = '';
 		self::$_token = [(string)$parsed['access_token'], time() + (int)($parsed['expires_in'] ?? 0)];
 		return self::$_token[0];
+	}
+
+	/**
+	 * 토큰을 못 받은 이유. 인증 실패는 키와 테스트 모드가 어긋난 경우가 대부분이다.
+	 */
+	protected function tokenErrorMessage(int $status, array $parsed, string $body): string
+	{
+		if ($status === 401 || $status === 403)
+		{
+			return sprintf(lang('zittme_pay.msg_paypal_auth_failed'), $this->modeLabel());
+		}
+		if ($status === 0)
+		{
+			return lang('zittme_pay.msg_pg_unreachable');
+		}
+		$detail = trim((string)($parsed['error_description'] ?? $parsed['message'] ?? ''));
+		return lang('zittme_pay.msg_pg_error') . ' (HTTP ' . $status . ($detail !== '' ? ' · ' . $detail : '') . ')';
+	}
+
+	/**
+	 * 결제까지 가지 않고 인증만 해 본다. 정상이면 빈 문자열, 아니면 사유를 돌려준다.
+	 *
+	 * 설정 화면에서 저장 전 값으로도 확인할 수 있어야 해서 키를 인자로 받는다.
+	 */
+	public function checkConnection(string $client_id = '', string $secret = ''): string
+	{
+		if ($client_id !== '')
+		{
+			$this->config->paypal_client_id = $client_id;
+			$this->config->paypal_secret = $secret;
+		}
+
+		// 캐시된 토큰이 있으면 바뀐 키로 확인이 안 된다
+		self::$_token = ['', 0];
+		self::$_token_error = '';
+
+		return $this->accessToken() !== '' ? '' : (self::$_token_error ?: lang('zittme_pay.msg_pg_unreachable'));
+	}
+
+	/**
+	 * 지금 어느 쪽으로 부르고 있는지 (샌드박스 / 실거래).
+	 */
+	public function modeLabel(): string
+	{
+		return lang($this->config->test_mode === 'Y' ? 'zittme_pay.paypal_mode_sandbox' : 'zittme_pay.paypal_mode_live');
 	}
 
 	protected function apiBase(): string

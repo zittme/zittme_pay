@@ -201,6 +201,15 @@ $lang->msg_missing_payment_key = 'PG 取引番号がありません。';
 $lang->msg_unknown_pg_status = '不明な決済状態です。';
 $lang->msg_pg_error = 'PG との通信中にエラーが発生しました。';
 $lang->msg_pg_unreachable = 'PG サーバーに接続できません。';
+$lang->msg_paypal_auth_failed = 'PayPal の認証に失敗しました。現在 %s に接続しています。キーがこのモードのものか確認してください。';
+$lang->paypal_mode_sandbox = 'サンドボックス(テスト)';
+$lang->paypal_mode_live = '本番';
+$lang->zpay_paypal_mode = '接続先';
+$lang->zpay_paypal_mode_help = 'テストモードをオンにするとサンドボックス、オフにすると本番に接続します。キーも同じ側のものが必要です。';
+$lang->zpay_paypal_test = '接続確認';
+$lang->zpay_paypal_testing = '確認中...';
+$lang->msg_paypal_test_ok = 'PayPal に正常に接続できます。';
+$lang->msg_paypal_test_empty = 'クライアント ID とシークレットを先に入力してください。';
 $lang->msg_query_not_supported = 'この決済手段は照会に対応していません。';
 
 $lang->msg_cancel_success = '決済がキャンセルされました。';

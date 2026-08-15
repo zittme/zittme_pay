@@ -201,6 +201,15 @@ $lang->msg_missing_payment_key = 'PG 거래번호가 없습니다.';
 $lang->msg_unknown_pg_status = '알 수 없는 결제 상태입니다.';
 $lang->msg_pg_error = 'PG 통신 중 오류가 발생했습니다.';
 $lang->msg_pg_unreachable = 'PG 서버에 연결할 수 없습니다.';
+$lang->msg_paypal_auth_failed = '페이팔 인증에 실패했습니다. 지금 %s 로 연결하고 있습니다. 키가 이 모드의 것인지 확인해 주세요.';
+$lang->paypal_mode_sandbox = '샌드박스(테스트)';
+$lang->paypal_mode_live = '실거래';
+$lang->zpay_paypal_mode = '연결 대상';
+$lang->zpay_paypal_mode_help = '테스트 모드를 켜면 샌드박스로, 끄면 실거래로 연결합니다. 키도 같은 쪽 것이어야 합니다. 테스트 모드는 기본 설정에서 바꿉니다.';
+$lang->zpay_paypal_test = '연결 확인';
+$lang->zpay_paypal_testing = '확인 중...';
+$lang->msg_paypal_test_ok = '페이팔에 정상적으로 연결됩니다.';
+$lang->msg_paypal_test_empty = '클라이언트 ID와 시크릿을 먼저 입력해 주세요.';
 $lang->msg_query_not_supported = '이 결제수단은 조회를 지원하지 않습니다.';
 
 $lang->msg_cancel_success = '결제가 취소되었습니다.';

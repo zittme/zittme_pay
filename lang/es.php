@@ -201,6 +201,15 @@ $lang->msg_missing_payment_key = 'Falta el identificador de transacción.';
 $lang->msg_unknown_pg_status = 'Estado de pago desconocido.';
 $lang->msg_pg_error = 'La pasarela de pago ha devuelto un error.';
 $lang->msg_pg_unreachable = 'No se ha podido contactar con la pasarela de pago.';
+$lang->msg_paypal_auth_failed = 'Fallo de autenticacion con PayPal. Estas conectando a %s. Comprueba que las claves correspondan a ese modo.';
+$lang->paypal_mode_sandbox = 'Sandbox (prueba)';
+$lang->paypal_mode_live = 'Produccion';
+$lang->zpay_paypal_mode = 'Conectando a';
+$lang->zpay_paypal_mode_help = 'Con el modo de prueba activado se conecta al sandbox; desactivado, a produccion. Las claves deben coincidir.';
+$lang->zpay_paypal_test = 'Probar conexion';
+$lang->zpay_paypal_testing = 'Comprobando...';
+$lang->msg_paypal_test_ok = 'Conexion con PayPal correcta.';
+$lang->msg_paypal_test_empty = 'Introduce primero el client ID y el secreto.';
 $lang->msg_query_not_supported = 'Este método de pago no admite consultas.';
 
 $lang->msg_cancel_success = 'El pago ha sido cancelado.';

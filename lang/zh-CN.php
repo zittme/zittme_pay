@@ -201,6 +201,15 @@ $lang->msg_missing_payment_key = '缺少网关交易号。';
 $lang->msg_unknown_pg_status = '未知的支付状态。';
 $lang->msg_pg_error = '与支付网关通信时发生错误。';
 $lang->msg_pg_unreachable = '无法连接支付网关服务器。';
+$lang->msg_paypal_auth_failed = 'PayPal 认证失败。当前连接到 %s。请确认密钥与该模式一致。';
+$lang->paypal_mode_sandbox = '沙盒(测试)';
+$lang->paypal_mode_live = '正式';
+$lang->zpay_paypal_mode = '连接对象';
+$lang->zpay_paypal_mode_help = '开启测试模式连接沙盒，关闭则连接正式环境。密钥须与之匹配。';
+$lang->zpay_paypal_test = '连接测试';
+$lang->zpay_paypal_testing = '检查中...';
+$lang->msg_paypal_test_ok = '已成功连接 PayPal。';
+$lang->msg_paypal_test_empty = '请先输入客户端 ID 和密钥。';
 $lang->msg_query_not_supported = '该支付方式不支持查询。';
 
 $lang->msg_cancel_success = '支付已取消。';

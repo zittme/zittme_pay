@@ -451,6 +451,31 @@ class Admin extends Base
 		$this->setRedirectUrl(getNotEncodedUrl('', 'module', 'admin', 'act', 'dispZittme_payAdminLogs'));
 	}
 
+	/**
+	 * 페이팔 연결 확인. 결제까지 가지 않고 인증만 해 본다.
+	 *
+	 * 키가 틀렸는지, 테스트 모드와 어긋났는지, 서버에 못 닿는지를
+	 * 설정 화면에서 바로 가려내기 위한 것이다.
+	 */
+	public function procZittme_payAdminTestPaypal()
+	{
+		$client_id = trim((string)\Context::get('paypal_client_id'));
+		$secret = trim((string)\Context::get('paypal_secret'));
+		if ($client_id === '' || $secret === '')
+		{
+			throw new Exception('zittme_pay.msg_paypal_test_empty');
+		}
+
+		$driver = \Zittme\Modules\Zittme_pay\Gateways\Drivers\Paypal::getInstance();
+		$error = $driver->checkConnection($client_id, $secret);
+		if ($error !== '')
+		{
+			throw new Exception($error);
+		}
+
+		$this->setMessage(sprintf(lang('zittme_pay.msg_paypal_test_ok'), $driver->modeLabel()));
+	}
+
 	/* ---------------------------------------------------------------------
 	 * 내부
 	 * ------------------------------------------------------------------- */

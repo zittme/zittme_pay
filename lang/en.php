@@ -201,6 +201,15 @@ $lang->msg_missing_payment_key = 'The gateway transaction ID is missing.';
 $lang->msg_unknown_pg_status = 'Unknown payment status.';
 $lang->msg_pg_error = 'The payment gateway returned an error.';
 $lang->msg_pg_unreachable = 'Could not reach the payment gateway.';
+$lang->msg_paypal_auth_failed = 'PayPal authentication failed. You are connecting to %s. Check that the keys match this mode.';
+$lang->paypal_mode_sandbox = 'Sandbox (test)';
+$lang->paypal_mode_live = 'Live';
+$lang->zpay_paypal_mode = 'Connecting to';
+$lang->zpay_paypal_mode_help = 'Test mode on connects to the sandbox, off connects to live. The keys must match. Test mode is set under Basic settings.';
+$lang->zpay_paypal_test = 'Test connection';
+$lang->zpay_paypal_testing = 'Checking...';
+$lang->msg_paypal_test_ok = 'Connected to PayPal successfully.';
+$lang->msg_paypal_test_empty = 'Enter the client ID and secret first.';
 $lang->msg_query_not_supported = 'This payment method does not support lookups.';
 
 $lang->msg_cancel_success = 'The payment was cancelled.';

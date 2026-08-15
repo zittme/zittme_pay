@@ -201,6 +201,15 @@ $lang->msg_missing_payment_key = 'Thiếu mã giao dịch của cổng thanh to�
 $lang->msg_unknown_pg_status = 'Trạng thái thanh toán không xác định.';
 $lang->msg_pg_error = 'Đã xảy ra lỗi khi giao tiếp với cổng thanh toán.';
 $lang->msg_pg_unreachable = 'Không thể kết nối tới máy chủ cổng thanh toán.';
+$lang->msg_paypal_auth_failed = 'Xac thuc PayPal that bai. Ban dang ket noi toi %s. Hay kiem tra khoa co dung che do nay khong.';
+$lang->paypal_mode_sandbox = 'Sandbox (thu nghiem)';
+$lang->paypal_mode_live = 'That';
+$lang->zpay_paypal_mode = 'Ket noi toi';
+$lang->zpay_paypal_mode_help = 'Bat che do thu nghiem se ket noi sandbox, tat se ket noi that. Khoa phai khop.';
+$lang->zpay_paypal_test = 'Kiem tra ket noi';
+$lang->zpay_paypal_testing = 'Dang kiem tra...';
+$lang->msg_paypal_test_ok = 'Ket noi PayPal thanh cong.';
+$lang->msg_paypal_test_empty = 'Vui long nhap client ID va secret truoc.';
 $lang->msg_query_not_supported = 'Phương thức này không hỗ trợ truy vấn.';
 
 $lang->msg_cancel_success = 'Thanh toán đã được hủy.';

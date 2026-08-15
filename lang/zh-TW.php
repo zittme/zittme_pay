@@ -201,6 +201,15 @@ $lang->msg_missing_payment_key = '缺少金流交易編號。';
 $lang->msg_unknown_pg_status = '未知的付款狀態。';
 $lang->msg_pg_error = '與金流通訊時發生錯誤。';
 $lang->msg_pg_unreachable = '無法連線至金流伺服器。';
+$lang->msg_paypal_auth_failed = 'PayPal 認證失敗。目前連線到 %s。請確認金鑰與該模式一致。';
+$lang->paypal_mode_sandbox = '沙盒(測試)';
+$lang->paypal_mode_live = '正式';
+$lang->zpay_paypal_mode = '連線對象';
+$lang->zpay_paypal_mode_help = '開啟測試模式連線沙盒，關閉則連線正式環境。金鑰須與之相符。';
+$lang->zpay_paypal_test = '連線測試';
+$lang->zpay_paypal_testing = '檢查中...';
+$lang->msg_paypal_test_ok = '已成功連線 PayPal。';
+$lang->msg_paypal_test_empty = '請先輸入用戶端 ID 和密鑰。';
 $lang->msg_query_not_supported = '此付款方式不支援查詢。';
 
 $lang->msg_cancel_success = '付款已取消。';

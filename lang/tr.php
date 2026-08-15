@@ -201,6 +201,15 @@ $lang->msg_missing_payment_key = 'Sağlayıcı işlem numarası eksik.';
 $lang->msg_unknown_pg_status = 'Bilinmeyen ödeme durumu.';
 $lang->msg_pg_error = 'Ödeme sağlayıcısı bir hata döndürdü.';
 $lang->msg_pg_unreachable = 'Ödeme sağlayıcısına ulaşılamadı.';
+$lang->msg_paypal_auth_failed = 'PayPal kimlik dogrulamasi basarisiz. Su anda %s baglaniyorsunuz. Anahtarlarin bu moda ait oldugunu kontrol edin.';
+$lang->paypal_mode_sandbox = 'Sandbox (test)';
+$lang->paypal_mode_live = 'Canli';
+$lang->zpay_paypal_mode = 'Baglanti hedefi';
+$lang->zpay_paypal_mode_help = 'Test modu acikken sandbox, kapaliyken canli ortama baglanir. Anahtarlar da ayni olmali.';
+$lang->zpay_paypal_test = 'Baglantiyi test et';
+$lang->zpay_paypal_testing = 'Kontrol ediliyor...';
+$lang->msg_paypal_test_ok = 'PayPal baglantisi basarili.';
+$lang->msg_paypal_test_empty = 'Once client ID ve secret girin.';
 $lang->msg_query_not_supported = 'Bu ödeme yöntemi sorgulamayı desteklemiyor.';
 
 $lang->msg_cancel_success = 'Ödeme iptal edildi.';

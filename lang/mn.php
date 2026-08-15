@@ -201,6 +201,15 @@ $lang->msg_missing_payment_key = 'Гүйлгээний дугаар алга.';
 $lang->msg_unknown_pg_status = 'Тодорхойгүй төлбөрийн төлөв.';
 $lang->msg_pg_error = 'Төлбөрийн үйлчилгээнээс алдаа буцаалаа.';
 $lang->msg_pg_unreachable = 'Төлбөрийн серверт холбогдож чадсангүй.';
+$lang->msg_paypal_auth_failed = 'PayPal баталгаажуулалт амжилтгүй. Одоо %s руу холбогдож байна. Түлхүүр энэ горимынх эсэхийг шалгана уу.';
+$lang->paypal_mode_sandbox = 'Sandbox (туршилт)';
+$lang->paypal_mode_live = 'Бодит';
+$lang->zpay_paypal_mode = 'Холбогдож буй';
+$lang->zpay_paypal_mode_help = 'Туршилтын горим асаалттай үед sandbox, унтраалттай үед бодит орчинтой холбогдоно. Түлхүүр ч мөн адил байх ёстой.';
+$lang->zpay_paypal_test = 'Холболт шалгах';
+$lang->zpay_paypal_testing = 'Шалгаж байна...';
+$lang->msg_paypal_test_ok = 'PayPal-тай амжилттай холбогдлоо.';
+$lang->msg_paypal_test_empty = 'Эхлээд client ID болон secret оруулна уу.';
 $lang->msg_query_not_supported = 'Энэ төлбөрийн хэрэгсэл лавлагааг дэмждэггүй.';
 
 $lang->msg_cancel_success = 'Төлбөр цуцлагдлаа.';

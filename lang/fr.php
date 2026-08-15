@@ -201,6 +201,15 @@ $lang->msg_missing_payment_key = 'L\'identifiant de transaction est absent.';
 $lang->msg_unknown_pg_status = 'Statut de paiement inconnu.';
 $lang->msg_pg_error = 'Le prestataire de paiement a renvoyé une erreur.';
 $lang->msg_pg_unreachable = 'Impossible de joindre le prestataire de paiement.';
+$lang->msg_paypal_auth_failed = 'Echec de l authentification PayPal. Vous vous connectez a %s. Verifiez que les cles correspondent a ce mode.';
+$lang->paypal_mode_sandbox = 'Sandbox (test)';
+$lang->paypal_mode_live = 'Production';
+$lang->zpay_paypal_mode = 'Connexion a';
+$lang->zpay_paypal_mode_help = 'Le mode test se connecte au sandbox, sinon a la production. Les cles doivent correspondre.';
+$lang->zpay_paypal_test = 'Tester la connexion';
+$lang->zpay_paypal_testing = 'Verification...';
+$lang->msg_paypal_test_ok = 'Connexion a PayPal reussie.';
+$lang->msg_paypal_test_empty = 'Saisissez d abord l identifiant client et le secret.';
 $lang->msg_query_not_supported = 'Ce moyen de paiement ne permet pas la consultation.';
 
 $lang->msg_cancel_success = 'Le paiement a été annulé.';

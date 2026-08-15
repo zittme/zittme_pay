@@ -201,6 +201,15 @@ $lang->msg_missing_payment_key = 'Отсутствует идентификат�
 $lang->msg_unknown_pg_status = 'Неизвестный статус платежа.';
 $lang->msg_pg_error = 'Платёжный провайдер вернул ошибку.';
 $lang->msg_pg_unreachable = 'Не удалось связаться с платёжным провайдером.';
+$lang->msg_paypal_auth_failed = 'Ошибка авторизации PayPal. Сейчас идет подключение к %s. Проверьте, что ключи соответствуют этому режиму.';
+$lang->paypal_mode_sandbox = 'Песочница (тест)';
+$lang->paypal_mode_live = 'Боевой режим';
+$lang->zpay_paypal_mode = 'Подключение к';
+$lang->zpay_paypal_mode_help = 'При включенном тестовом режиме используется песочница, при выключенном - боевой режим. Ключи должны совпадать.';
+$lang->zpay_paypal_test = 'Проверить подключение';
+$lang->zpay_paypal_testing = 'Проверка...';
+$lang->msg_paypal_test_ok = 'Подключение к PayPal выполнено.';
+$lang->msg_paypal_test_empty = 'Сначала введите client ID и secret.';
 $lang->msg_query_not_supported = 'Этот способ оплаты не поддерживает запрос состояния.';
 
 $lang->msg_cancel_success = 'Платёж отменён.';

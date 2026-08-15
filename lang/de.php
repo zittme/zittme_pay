@@ -201,6 +201,15 @@ $lang->msg_missing_payment_key = 'Die Transaktionsnummer des Anbieters fehlt.';
 $lang->msg_unknown_pg_status = 'Unbekannter Zahlungsstatus.';
 $lang->msg_pg_error = 'Der Zahlungsanbieter hat einen Fehler zurückgegeben.';
 $lang->msg_pg_unreachable = 'Der Zahlungsanbieter ist nicht erreichbar.';
+$lang->msg_paypal_auth_failed = 'PayPal-Authentifizierung fehlgeschlagen. Sie verbinden sich mit %s. Prufen Sie, ob die Schlussel zu diesem Modus passen.';
+$lang->paypal_mode_sandbox = 'Sandbox (Test)';
+$lang->paypal_mode_live = 'Live';
+$lang->zpay_paypal_mode = 'Verbindung zu';
+$lang->zpay_paypal_mode_help = 'Testmodus an verbindet mit der Sandbox, aus mit Live. Die Schlussel mussen dazu passen.';
+$lang->zpay_paypal_test = 'Verbindung testen';
+$lang->zpay_paypal_testing = 'Prufe...';
+$lang->msg_paypal_test_ok = 'Verbindung zu PayPal erfolgreich.';
+$lang->msg_paypal_test_empty = 'Bitte zuerst Client-ID und Secret eingeben.';
 $lang->msg_query_not_supported = 'Diese Zahlungsart unterstützt keine Abfrage.';
 
 $lang->msg_cancel_success = 'Die Zahlung wurde storniert.';

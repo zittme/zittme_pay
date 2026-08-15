@@ -569,8 +569,8 @@ class Pay extends Base
 		}
 		try
 		{
-			$prefix = (string)(\Rhymix\Framework\Config::get('db.master.prefix') ?? '');
-			$handle = \Rhymix\Framework\DB::getInstance()->getHandle();
+			$prefix = (string)(\Zittme\Framework\Config::get('db.master.prefix') ?? '');
+			$handle = \Zittme\Framework\DB::getInstance()->getHandle();
 			if ($module === 'commerce')
 			{
 				$stmt = $handle->prepare('SELECT order_code FROM `' . $prefix . 'commerce_order` WHERE order_srl = ?');

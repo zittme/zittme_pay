@@ -34,8 +34,10 @@ class Kcp extends Base
 
 	public function isConfigured(): bool
 	{
+		// 개인키는 취소 서명(kcp_sign_data)에 쓴다. 없으면 결제만 되고 환불이 막힌다
 		return trim((string)$this->config->kcp_site_cd) !== ''
-			&& trim((string)$this->config->kcp_cert_info) !== '';
+			&& trim((string)$this->config->kcp_cert_info) !== ''
+			&& trim((string)$this->config->kcp_priv_key) !== '';
 	}
 
 	public function requiresClientPayment(): bool

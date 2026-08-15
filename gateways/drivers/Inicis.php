@@ -37,8 +37,10 @@ class Inicis extends Base
 
 	public function isConfigured(): bool
 	{
+		// API 키는 취소·환불에 쓴다. 없으면 결제만 되고 환불이 막히므로 여기서 함께 본다
 		return trim((string)$this->config->inicis_mid) !== ''
-			&& trim((string)$this->config->inicis_sign_key) !== '';
+			&& trim((string)$this->config->inicis_sign_key) !== ''
+			&& trim((string)$this->config->inicis_api_key) !== '';
 	}
 
 	public function requiresClientPayment(): bool
@@ -207,36 +209,39 @@ class Inicis extends Base
 		$timestamp = date('YmdHis');
 		$client_ip = (string)($_SERVER['SERVER_ADDR'] ?? '127.0.0.1');
 		$reason = mb_substr($reason !== '' ? $reason : lang('zittme_pay.cancel_default_reason'), 0, 100);
+		// 승인 때 받아 둔 결제수단. 해시 대상이라 비우면 인증이 어긋난다
+		$paymethod = self::payMethodCode((string)($order->pay_method ?? ''));
 
 		$partial = ($amount > 0 && $amount < (int)$order->amount);
-		if ($partial)
-		{
-			$type = 'partialRefund';
-			$data = [
-				'tid' => $tid,
-				'msg' => $reason,
-				'price' => (string)$amount,
-				'confirmPrice' => (string)((int)$order->amount - (int)$order->cancelled_amount - $amount),
-			];
-		}
-		else
-		{
-			$type = 'refund';
-			$data = ['tid' => $tid, 'msg' => $reason];
-		}
+		$type = $partial ? 'PartialRefund' : 'Refund';
 
-		// hashData = SHA512(key + type + paymethod + timestamp + clientIp + mid + data(JSON))
-		$data_json = json_encode($data, \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES);
-		$hash = hash('sha512', $api_key . $type . '' . $timestamp . $client_ip . $mid . $data_json);
-
-		[$ok, $status_code, $body, $parsed] = $this->request(self::REFUND_URL, 'POST', [
-			'mid' => $mid,
+		$params = [
 			'type' => $type,
+			'paymethod' => $paymethod,
 			'timestamp' => $timestamp,
 			'clientIp' => $client_ip,
-			'hashData' => $hash,
-			'data' => $data,
-		], ['Content-Type' => 'application/json']);
+			'mid' => $mid,
+			'tid' => $tid,
+			'msg' => $reason,
+		];
+
+		// hashData = SHA512(INIAPI키 + type + paymethod + timestamp + clientIp + mid + tid)
+		// 부분취소는 뒤에 price + confirmPrice 가 더 붙는다
+		$plain = $api_key . $type . $paymethod . $timestamp . $client_ip . $mid . $tid;
+		if ($partial)
+		{
+			$price = (string)$amount;
+			$confirm = (string)((int)$order->amount - (int)$order->cancelled_amount - $amount);
+			$params['price'] = $price;
+			$params['confirmPrice'] = $confirm;
+			$plain .= $price . $confirm;
+		}
+		$params['hashData'] = hash('sha512', $plain);
+
+		// NVP(form) 전송이다. JSON 은 받지 않는다
+		[$ok, $status_code, $body, $parsed] = $this->request(self::REFUND_URL, 'POST', $params, [
+			'Content-Type' => 'application/x-www-form-urlencoded;charset=utf-8',
+		]);
 
 		if (!$ok || (string)($parsed['resultCode'] ?? '') !== '00')
 		{
@@ -250,6 +255,23 @@ class Inicis extends Base
 			'status' => $partial ? Order::STATUS_PARTIAL_CANCELLED : Order::STATUS_CANCELLED,
 			'raw' => $body,
 		]);
+	}
+
+	/**
+	 * 승인 응답의 payMethod 를 INIAPI 가 쓰는 지불수단 코드로 맞춘다.
+	 * 모르는 값이면 카드로 본다 — 표준결제에서 가장 흔하다.
+	 */
+	protected static function payMethodCode(string $stored): string
+	{
+		$map = [
+			'card' => 'Card',
+			'vbank' => 'Vbank',
+			'directbank' => 'Bank',
+			'bank' => 'Bank',
+			'hpp' => 'HPP',
+			'phone' => 'HPP',
+		];
+		return $map[strtolower(trim($stored))] ?? 'Card';
 	}
 
 	/**
