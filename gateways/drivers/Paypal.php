@@ -37,6 +37,11 @@ class Paypal extends Base
 	 */
 	protected static array $_token = ['', 0];
 
+	/**
+	 * 토큰을 못 받았을 때의 사유. 화면과 로그에 실어 보낸다.
+	 */
+	protected static string $_token_error = '';
+
 	public function getName(): string
 	{
 		return 'paypal';

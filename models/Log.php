@@ -164,4 +164,65 @@ class Log
 			'regdate' => date('YmdHis', time() - ($days * 86400)),
 		]);
 	}
+/**
+	 * 응답을 사람이 읽는 한 줄로 줄인다.
+	 *
+	 * 대행사 응답은 그쪽 문구를, 우리가 만든 값(무통장 계좌·입금기한)은 우리 문구를 쓴다.
+	 * 원문은 화면이 title 로 함께 실어 보내므로 여기서는 요약만 만든다.
+	 *
+	 * @param string $raw
+	 * @return string
+	 */
+	public static function summarize(string $raw): string
+	{
+		$raw = trim($raw);
+		if ($raw === '')
+		{
+			return '';
+		}
+		if ($raw[0] !== '{' && $raw[0] !== '[')
+		{
+			return mb_substr($raw, 0, 200);
+		}
+
+		$data = json_decode($raw, true);
+		if (!is_array($data))
+		{
+			return mb_substr($raw, 0, 200);
+		}
+
+		// 대행사가 준 문구가 있으면 그것이 가장 쓸모 있다
+		foreach (['resultMsg', 'message', 'res_msg', 'error_description', 'msg'] as $key)
+		{
+			if (trim((string)($data[$key] ?? '')) !== '')
+			{
+				return mb_substr((string)$data[$key], 0, 200);
+			}
+		}
+
+		$parts = [];
+		$account = $data['account'] ?? null;
+		if (is_array($account))
+		{
+			$parts[] = trim(($account['bank'] ?? '') . ' ' . ($account['account'] ?? ''));
+			if (trim((string)($account['holder'] ?? '')) !== '')
+			{
+				$parts[] = (string)$account['holder'];
+			}
+		}
+		elseif (trim((string)$account) !== '')
+		{
+			$parts[] = (string)$account;
+		}
+		if (trim((string)($data['depositor'] ?? '')) !== '')
+		{
+			$parts[] = lang('zittme_pay.zpay_log_depositor') . ' ' . $data['depositor'];
+		}
+		if (trim((string)($data['due_date'] ?? '')) !== '')
+		{
+			$parts[] = lang('zittme_pay.zpay_log_due') . ' ' . zdate((string)$data['due_date'], 'Y-m-d H:i');
+		}
+
+		return count($parts) ? implode(' · ', $parts) : mb_substr($raw, 0, 200);
+	}
 }

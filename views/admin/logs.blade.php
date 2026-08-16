@@ -64,7 +64,7 @@
 					@endif
 				</td>
 				<td>{{ number_format($log->amount) }}</td>
-				<td><code>{{ mb_substr($log->response_data, 0, 200) }}</code></td>
+				<td><span title="{{ mb_substr($log->response_data, 0, 500) }}">{{ \Zittme\Modules\Zittme_pay\Models\Log::summarize((string)$log->response_data) }}</span></td>
 			</tr>
 			@endforeach
 
