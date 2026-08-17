@@ -35,7 +35,17 @@ class Ticket
 	 */
 	protected static function dir(): string
 	{
-		return \RX_BASEDIR . 'files/cache/zittme_pay/';
+		$dir = \RX_BASEDIR . 'files/cache/zittme_pay/';
+
+		// 캐시 비우기로 통째로 사라지는 자리다. 없으면 그때그때 다시 만든다.
+		// 바깥에서 파일을 직접 읽지 못하도록 보호 파일도 함께 둔다.
+		if (!\Zittme\Framework\Storage::isDirectory($dir))
+		{
+			\Zittme\Framework\Storage::createDirectory($dir);
+			\Zittme\Framework\Storage::protectDirectory($dir);
+		}
+
+		return $dir;
 	}
 
 	/**

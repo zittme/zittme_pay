@@ -126,6 +126,7 @@ class Pay extends Base
 		\Context::addCSSFile($asset_base . 'css/pay.css');
 		\Context::addJsFile($asset_base . 'js/pay.js');
 
+		$this->applyInstanceLayout();
 		$this->setTemplatePath($this->getSkinPath());
 		$this->setTemplateFile('checkout');
 	}
@@ -539,6 +540,7 @@ class Pay extends Base
 		$asset_base = './' . ltrim(str_replace(\RX_BASEDIR, '', $this->getSkinPath()), './');
 		\Context::addCSSFile($asset_base . 'css/pay.css');
 
+		$this->applyInstanceLayout();
 		$this->setTemplatePath($this->getSkinPath());
 		$this->setTemplateFile('result');
 	}

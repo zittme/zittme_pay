@@ -171,7 +171,7 @@
 	</form>
 
 	<div class="section" style="margin-top:18px">
-		<h1>스킨 설정</h1>
+		<h1>화면 설정</h1>
 		<form action="./" method="post">
 			<input type="hidden" name="module" value="zittme_pay" />
 			<input type="hidden" name="act" value="procZittme_payAdminUpdateSkin" />
@@ -187,9 +187,37 @@
 					<p class="x_help-block">기본 디자인 따름으로 두면 사이트 디자인 설정(테마 적용 포함)의 스킨을 그대로 씁니다.</p>
 				</div>
 			</div>
+
+			<div class="x_control-group">
+				<label class="x_control-label" for="zpay_layout">레이아웃 (PC)</label>
+				<div class="x_controls">
+					<select id="zpay_layout" name="layout_srl">
+						<option value="-1" @if ((int)($zpay_instance->layout_srl ?? -1) === -1) selected @endif>사이트 기본 레이아웃 따름</option>
+						@foreach ($zpay_layouts as $zpay_lo)
+						<option value="{{ $zpay_lo->layout_srl }}" @if ((int)($zpay_instance->layout_srl ?? -1) === (int)$zpay_lo->layout_srl) selected @endif>{{ $zpay_lo->title ?: $zpay_lo->layout }}</option>
+						@endforeach
+					</select>
+					<p class="x_help-block">결제 화면에 씌울 레이아웃입니다. 결제 주소에는 게시판 같은 주소값이 없어 코어가 레이아웃을 자동으로 붙이지 못하므로, 여기서 고른 값을 씁니다.</p>
+				</div>
+			</div>
+
+			<div class="x_control-group">
+				<label class="x_control-label" for="zpay_mlayout">레이아웃 (모바일)</label>
+				<div class="x_controls">
+					<select id="zpay_mlayout" name="mlayout_srl">
+						<option value="-1" @if ((int)($zpay_instance->mlayout_srl ?? -1) === -1) selected @endif>사이트 기본 레이아웃 따름</option>
+						<option value="-2" @if ((int)($zpay_instance->mlayout_srl ?? -1) === -2) selected @endif>PC 설정을 그대로 사용</option>
+						@foreach ($zpay_mlayouts as $zpay_mlo)
+						<option value="{{ $zpay_mlo->layout_srl }}" @if ((int)($zpay_instance->mlayout_srl ?? -1) === (int)$zpay_mlo->layout_srl) selected @endif>{{ $zpay_mlo->title ?: $zpay_mlo->layout }}</option>
+						@endforeach
+					</select>
+					<p class="x_help-block">반응형 레이아웃을 쓰신다면 "PC 설정을 그대로 사용"으로 두시면 됩니다.</p>
+				</div>
+			</div>
+
 			<div class="x_clearfix">
 				<div class="x_pull-right">
-					<button type="submit" class="x_btn x_btn-primary">스킨 적용</button>
+					<button type="submit" class="x_btn x_btn-primary">화면 설정 저장</button>
 				</div>
 			</div>
 		</form>

@@ -102,6 +102,29 @@ class Base extends \ModuleObject
 	 *
 	 * @return string
 	 */
+	/**
+	 * 결제 화면에 레이아웃을 씌운다.
+	 *
+	 * 결제 주소에는 mid 가 없어(standalone) 코어가 레이아웃을 붙여 주지 않는다.
+	 * 그래서 인스턴스에 설정된 레이아웃 번호를 화면을 그리기 전에 직접 넣어 준다.
+	 *
+	 * @return void
+	 */
+	public function applyInstanceLayout(): void
+	{
+		$instance = self::getDefaultInstance();
+		if (!$instance)
+		{
+			return;
+		}
+
+		// -1 은 사이트 기본 레이아웃, -2 는 모바일에서 PC 설정을 따른다는 뜻이다.
+		// 코어가 그대로 해석하므로 값을 옮겨 주기만 하면 된다.
+		$this->module_info->layout_srl = (int)($instance->layout_srl ?? -1);
+		$this->module_info->mlayout_srl = (int)($instance->mlayout_srl ?? -1);
+		$this->module_info->site_srl = (int)($instance->site_srl ?? 0);
+	}
+
 	public function getSkinPath(): string
 	{
 		$skin = self::getSkinName();

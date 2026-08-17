@@ -51,10 +51,8 @@ class Install extends Base
 	 */
 	public function checkUpdate()
 	{
-		if (!Storage::isDirectory(\RX_BASEDIR . self::TICKET_DIR))
-		{
-			return true;
-		}
+		// 티켓 폴더는 여기서 보지 않는다. 캐시 비우기로 사라지는 자리라
+		// 그때마다 "모듈 업데이트 필요"가 떴다. 폴더는 쓸 때 만든다.
 		if (!self::getDefaultInstance())
 		{
 			return true;

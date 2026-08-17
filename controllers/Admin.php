@@ -87,6 +87,12 @@ class Admin extends Base
 		\Context::set('zpay_skins', \ModuleModel::getSkins(\RX_BASEDIR . 'modules/zittme_pay') ?: []);
 		\Context::set('zpay_default_skin', (string)(\ModuleModel::getModuleDefaultSkin('zittme_pay', 'P') ?: 'default'));
 
+		// 레이아웃 — 결제 주소에는 mid 가 없어 코어가 레이아웃을 붙여 주지 않는다.
+		// 여기서 고른 값을 화면을 그릴 때 직접 적용한다.
+		$layout_model = getModel('layout');
+		\Context::set('zpay_layouts', $layout_model->getLayoutList(0, 'P') ?: []);
+		\Context::set('zpay_mlayouts', $layout_model->getLayoutList(0, 'M') ?: []);
+
 		$this->setTemplateFile('config');
 	}
 
@@ -109,6 +115,19 @@ class Admin extends Base
 			// is_skin_fix 가 N 이면 코어가 저장된 스킨을 무시하고 기본 디자인을 따른다
 			$module_info->is_skin_fix = ($skin === '/USE_DEFAULT/') ? 'N' : 'Y';
 		}
+
+		// 레이아웃 — -1 은 사이트 기본, -2 는 모바일에서 PC 설정을 따름
+		$layout_srl = \Context::get('layout_srl');
+		if ($layout_srl !== null && $layout_srl !== '')
+		{
+			$module_info->layout_srl = (int)$layout_srl;
+		}
+		$mlayout_srl = \Context::get('mlayout_srl');
+		if ($mlayout_srl !== null && $mlayout_srl !== '')
+		{
+			$module_info->mlayout_srl = (int)$mlayout_srl;
+		}
+
 		$module_info->isMenuCreate = false;
 
 		$output = \ModuleController::getInstance()->updateModule($module_info);
