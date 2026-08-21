@@ -26,6 +26,7 @@ abstract class Base
 		'nicepay',
 		'portone',
 		'paypal',
+		'conekta',
 		'banktransfer',
 	];
 

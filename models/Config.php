@@ -55,6 +55,13 @@ class Config
 		'paypal_currency' => 'USD',
 		// 1 결제통화당 KRW. 관리자가 직접 입력한다. 비어 있으면 페이팔은 비활성으로 취급된다.
 		'paypal_exchange_rate' => '',
+		// Conekta (멕시코). 비밀 키 하나로 인증하며 key_test / key_live 접두사로 모드가 갈린다.
+		'conekta_private_key' => '',
+		'conekta_webhook_secret' => '',
+		'conekta_currency' => 'MXN',
+		// 호스티드 결제 페이지에 열 결제수단. card / cash(OXXO) / bank_transfer(SPEI)
+		'conekta_methods' => ['card', 'cash', 'bank_transfer'],
+		'conekta_allow_krw' => 'N',
 
 		// 공용 환율 (Currency 모델이 관리). 짓미페이와 커머스가 함께 참조한다.
 		'exchange_rates' => [],
@@ -125,7 +132,7 @@ class Config
 			}
 
 			// 배열로 쓰는 값은 문자열로 저장돼 있어도 배열로 정규화한다.
-			foreach (['enabled_gateways', 'bank_accounts', 'exchange_rates', 'exchange_rates_manual', 'extra_currencies'] as $key)
+			foreach (['enabled_gateways', 'bank_accounts', 'exchange_rates', 'exchange_rates_manual', 'extra_currencies', 'conekta_methods'] as $key)
 			{
 				if (!is_array($config->{$key}))
 				{

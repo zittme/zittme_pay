@@ -37,6 +37,7 @@ class Admin extends Base
 			'nicepay_client_id', 'nicepay_secret_key',
 			'portone_store_id', 'portone_channel_key', 'portone_api_secret',
 			'paypal_client_id', 'paypal_secret', 'paypal_currency', 'paypal_exchange_rate', 'paypal_allow_krw',
+			'conekta_private_key', 'conekta_webhook_secret', 'conekta_currency', 'conekta_methods', 'conekta_allow_krw',
 			'exchange_rates', 'exchange_rates_manual', 'exchange_auto', 'exchange_source', 'exchange_api_key',
 			'bank_accounts', 'bank_due_days',
 		],
@@ -47,7 +48,7 @@ class Admin extends Base
 	 */
 	protected const BOOLEAN_FIELDS = [
 		'enabled', 'test_mode', 'allow_partial_cancel', 'notify_on_paid', 'notify_on_cancel',
-		'allow_force_cancel', 'exchange_auto', 'paypal_allow_krw',
+		'allow_force_cancel', 'exchange_auto', 'paypal_allow_krw', 'conekta_allow_krw',
 	];
 
 	/**
@@ -495,6 +496,27 @@ class Admin extends Base
 		$this->setMessage(sprintf(lang('zittme_pay.msg_paypal_test_ok'), $driver->modeLabel()));
 	}
 
+	/**
+	 * Conekta 연결 확인. 비밀 키로 주문 목록을 한 건 읽어 본다.
+	 */
+	public function procZittme_payAdminTestConekta()
+	{
+		$private_key = trim((string)\Context::get('conekta_private_key'));
+		if ($private_key === '')
+		{
+			throw new Exception('zittme_pay.msg_conekta_test_empty');
+		}
+
+		$driver = \Zittme\Modules\Zittme_pay\Gateways\Drivers\Conekta::getInstance();
+		$error = $driver->checkConnection($private_key);
+		if ($error !== '')
+		{
+			throw new Exception($error);
+		}
+
+		$this->setMessage(sprintf(lang('zittme_pay.msg_conekta_test_ok'), $driver->modeLabel()));
+	}
+
 	/* ---------------------------------------------------------------------
 	 * 내부
 	 * ------------------------------------------------------------------- */
@@ -573,6 +595,18 @@ class Admin extends Base
 		if ($key === 'bank_accounts')
 		{
 			return self::collectBankAccounts($vars);
+		}
+
+		if ($key === 'conekta_methods')
+		{
+			$picked = is_array($value) ? array_map('strval', $value) : [];
+			return array_values(array_intersect(\Zittme\Modules\Zittme_pay\Gateways\Drivers\Conekta::METHODS, $picked));
+		}
+
+		if ($key === 'conekta_currency')
+		{
+			$currency = strtoupper(preg_replace('/[^A-Za-z]/', '', (string)$value));
+			return in_array($currency, \Zittme\Modules\Zittme_pay\Gateways\Drivers\Conekta::currencyChoices(), true) ? $currency : 'MXN';
 		}
 
 		if ($key === 'exchange_rates')

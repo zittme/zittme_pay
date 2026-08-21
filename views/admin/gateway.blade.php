@@ -278,6 +278,56 @@
 			</div>
 		</div>
 
+		<h3>{{ $lang->gateway_conekta }}</h3>
+
+		<div class="x_control-group">
+			<label class="x_control-label" for="zpay_conekta_private_key">{{ $lang->zpay_conekta_private_key }}</label>
+			<div class="x_controls">
+				<input type="password" id="zpay_conekta_private_key" name="conekta_private_key" value="{{ $pay_config->conekta_private_key }}" class="x_full-width" autocomplete="off" />
+				<p class="x_help-block">{{ $lang->zpay_conekta_key_help }}</p>
+				<p><button type="button" class="x_btn" id="zpayConektaTest">{{ $lang->zpay_paypal_test }}</button></p>
+			</div>
+		</div>
+
+		<div class="x_control-group">
+			<label class="x_control-label" for="zpay_conekta_webhook_secret">{{ $lang->zpay_conekta_webhook }}</label>
+			<div class="x_controls">
+				<input type="text" readonly value="{{ \Zittme\Modules\Zittme_pay\Gateways\Base::buildActionUrl('procZittme_payWebhook') }}" class="x_full-width" onclick="this.select()" />
+				<p class="x_help-block">{{ $lang->zpay_conekta_webhook_help }}</p>
+			</div>
+		</div>
+
+		<div class="x_control-group">
+			<label class="x_control-label">{{ $lang->zpay_conekta_methods }}</label>
+			<div class="x_controls">
+				@php $zpay_ck_methods = is_array($pay_config->conekta_methods ?? null) ? $pay_config->conekta_methods : ['card', 'cash', 'bank_transfer']; @endphp
+				@foreach (['card', 'cash', 'bank_transfer'] as $zpay_ck_m)
+				@php $zpay_ck_label = lang('zittme_pay.zpay_conekta_method_' . $zpay_ck_m); @endphp
+				<label class="x_inline">
+					<input type="checkbox" name="conekta_methods[]" value="{{ $zpay_ck_m }}" @if (in_array($zpay_ck_m, $zpay_ck_methods, true)) checked @endif />
+					{{ $zpay_ck_label }}
+				</label>
+				@endforeach
+				<p class="x_help-block">{{ $lang->zpay_conekta_methods_help }}</p>
+			</div>
+		</div>
+
+		<div class="x_control-group">
+			<label class="x_control-label" for="zpay_conekta_currency">{{ $lang->zpay_conekta_currency }}</label>
+			<div class="x_controls">
+				<select id="zpay_conekta_currency" name="conekta_currency">
+					@foreach (\Zittme\Modules\Zittme_pay\Gateways\Drivers\Conekta::currencyChoices() as $zpay_cur)
+					<option value="{{ $zpay_cur }}" @if (($pay_config->conekta_currency ?? 'MXN') === $zpay_cur) selected @endif>{{ $zpay_cur }}</option>
+					@endforeach
+				</select>
+				<label class="x_inline" style="margin-left:12px">
+					<input type="checkbox" name="conekta_allow_krw" value="Y" @if (($pay_config->conekta_allow_krw ?? 'N') === 'Y') checked @endif />
+					{{ $lang->zpay_paypal_allow_krw_label_generic }}
+				</label>
+				<p class="x_help-block">{{ $lang->zpay_conekta_currency_help }}</p>
+			</div>
+		</div>
+
 		<h3>{{ $lang->gateway_banktransfer }}</h3>
 
 		<div class="x_control-group">
@@ -353,6 +403,25 @@
 		exec_json('zittme_pay.procZittme_payAdminTestPaypal', {
 			paypal_client_id: document.getElementById('zpay_paypal_client_id').value,
 			paypal_secret: document.getElementById('zpay_paypal_secret').value
+		}, function (ret) {
+			alert(ret.message);
+		}, function (ret) {
+			alert(ret.message);
+		}).always(function () {
+			btn.textContent = label;
+			btn.disabled = false;
+		});
+	});
+})();
+(function () {
+	var btn = document.getElementById('zpayConektaTest');
+	if (!btn) return;
+	btn.addEventListener('click', function () {
+		var label = btn.textContent;
+		btn.textContent = {!! json_encode($lang->zpay_paypal_testing) !!};
+		btn.disabled = true;
+		exec_json('zittme_pay.procZittme_payAdminTestConekta', {
+			conekta_private_key: document.getElementById('zpay_conekta_private_key').value
 		}, function (ret) {
 			alert(ret.message);
 		}, function (ret) {

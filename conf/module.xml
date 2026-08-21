@@ -47,6 +47,7 @@
 		<action name="procZittme_payAdminCompleteRefund" class="Controllers\Admin" permission="manager" />
 		<action name="procZittme_payAdminPurgeLogs" class="Controllers\Admin" permission="manager" />
 		<action name="procZittme_payAdminTestPaypal" class="Controllers\Admin" permission="manager" />
+		<action name="procZittme_payAdminTestConekta" class="Controllers\Admin" permission="manager" />
 	</actions>
 
 	<classes>

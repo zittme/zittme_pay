@@ -398,6 +398,14 @@ class Pay extends Base
 
 		// 토스는 {eventType, data:{...}} 로 감싸서 보낸다. 다른 PG 는 평평하게 보내기도 한다.
 		$data = is_array($body['data'] ?? null) ? $body['data'] : $body;
+		// Conekta 는 {type, data:{object:{id, metadata:{order_code}}}} 로 보낸다
+		if (is_array($data['object'] ?? null))
+		{
+			$data = $data['object'];
+			$data['order_code'] = (string)($data['metadata']['order_code'] ?? '');
+			// charge.* 이벤트는 charge 객체라 order_id 로 주문을 가리킨다
+			$data['tid'] = (string)($data['order_id'] ?? $data['id'] ?? '');
+		}
 		$order_code = (string)($data['orderId'] ?? $data['order_code'] ?? '');
 		$tid = (string)($data['paymentKey'] ?? $data['tid'] ?? '');
 
