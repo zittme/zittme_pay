@@ -198,6 +198,15 @@ class Pay extends Base
 				throw new \Zittme\Framework\Exception($redirect['error'] ?: lang('zittme_pay.msg_pg_error'));
 			}
 
+			// PG 주문 번호를 주문에 남긴다. 복귀 콜백과 웹훅이 이 값으로 재조회한다
+			if (!empty($redirect['pg_order_id']))
+			{
+				Order::update((int)$order->order_srl, [
+					'gateway' => $driver->getName(),
+					'pg_tid' => (string)$redirect['pg_order_id'],
+				]);
+			}
+
 			$this->add('requires_client', false);
 			$this->setRedirectUrl($redirect['redirect_url']);
 			return;
@@ -438,7 +447,8 @@ class Pay extends Base
 		}
 
 		// 재조회. 여기서 나온 값만 믿는다.
-		$verified = $driver->query($tid ?: (string)$order->pg_tid);
+		// 주문을 함께 넘겨야 드라이버가 금액·통화를 대조하고 amount 를 채운다
+		$verified = $driver->query($tid ?: (string)$order->pg_tid, $order);
 
 		Log::add([
 			'order_srl' => (int)$order->order_srl,

@@ -120,15 +120,13 @@ class Conekta extends Base
 			'failed' => '1',
 		]);
 
+		// Conekta 는 customer_info 의 name · email · phone 을 모두 요구한다
+		$phone = preg_replace('/[^0-9+]/', '', (string)($order->payer_phone ?? ''));
 		$customer = [
 			'name' => mb_substr(trim((string)($order->payer_name ?? '')) ?: 'Customer', 0, 80),
 			'email' => trim((string)($order->payer_email ?? '')) ?: 'noreply@' . $this->hostName(),
+			'phone' => $phone !== '' ? $phone : '+5200000000',
 		];
-		$phone = preg_replace('/[^0-9+]/', '', (string)($order->payer_phone ?? ''));
-		if ($phone !== '')
-		{
-			$customer['phone'] = $phone;
-		}
 
 		[$ok, $status_code, $body, $parsed] = $this->api('/orders', 'POST', [
 			'currency' => $fx['currency'],
