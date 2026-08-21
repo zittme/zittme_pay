@@ -289,14 +289,17 @@
 							<th>{{ $lang->zpay_bank_name }}</th>
 							<th>{{ $lang->zpay_bank_account }}</th>
 							<th>{{ $lang->zpay_bank_holder }}</th>
+							<th>{{ $lang->zpay_bank_extra }}</th>
 						</tr>
 					</thead>
 					<tbody>
 						@foreach($pay_config->bank_accounts as $account)
+						@php $zpay_extra_text = implode("\n", array_map(function($e) { return ($e['label'] ?? '') . '=' . ($e['value'] ?? ''); }, $account['extra'] ?? [])); @endphp
 						<tr>
 							<td><input type="text" name="bank_name[]" value="{{ $account['bank'] ?? '' }}" /></td>
 							<td><input type="text" name="bank_account[]" value="{{ $account['account'] ?? '' }}" /></td>
 							<td><input type="text" name="bank_holder[]" value="{{ $account['holder'] ?? '' }}" /></td>
+							<td><textarea name="bank_extra[]" rows="2" placeholder="{{ $lang->zpay_bank_extra_ph }}">{{ $zpay_extra_text }}</textarea></td>
 						</tr>
 						@endforeach
 						{{-- 항상 빈 줄을 하나 둬서 계좌를 더 넣을 수 있게 한다. --}}
@@ -304,15 +307,17 @@
 							<td><input type="text" name="bank_name[]" value="" /></td>
 							<td><input type="text" name="bank_account[]" value="" /></td>
 							<td><input type="text" name="bank_holder[]" value="" /></td>
+							<td><textarea name="bank_extra[]" rows="2" placeholder="{{ $lang->zpay_bank_extra_ph }}"></textarea></td>
 						</tr>
 						<tr>
 							<td><input type="text" name="bank_name[]" value="" /></td>
 							<td><input type="text" name="bank_account[]" value="" /></td>
 							<td><input type="text" name="bank_holder[]" value="" /></td>
+							<td><textarea name="bank_extra[]" rows="2" placeholder="{{ $lang->zpay_bank_extra_ph }}"></textarea></td>
 						</tr>
 					</tbody>
 				</table>
-				<p class="x_help-block">{{ $lang->zpay_bank_accounts_help }}</p>
+				<p class="x_help-block">{{ $lang->zpay_bank_accounts_help }} {{ $lang->zpay_bank_extra_help }}</p>
 			</div>
 		</div>
 

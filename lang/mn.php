@@ -108,6 +108,9 @@ $lang->zpay_bank_accounts_help = 'Банк ба дансны дугаар хоё
 $lang->zpay_bank_name = 'Банк';
 $lang->zpay_bank_account = 'Дансны дугаар';
 $lang->zpay_bank_holder = 'Данс эзэмшигч';
+$lang->zpay_bank_extra = 'Нэмэлт талбар';
+$lang->zpay_bank_extra_help = 'Мөр бүрт нэг, "Нэр=Утга" хэлбэрээр. Жишээ: Банкны код=002, Картын дугаар=1234-5678';
+$lang->zpay_bank_extra_ph = 'Банкны код=002';
 $lang->zpay_bank_due_days = 'Төлөх хугацаа (хоног)';
 $lang->zpay_bank_due_days_help = 'Хугацаа өнгөрвөл захиалга дуусгавар болно.';
 

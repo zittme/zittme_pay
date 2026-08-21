@@ -108,6 +108,9 @@ $lang->zpay_bank_accounts_help = 'Solo se guardan las filas con banco y número 
 $lang->zpay_bank_name = 'Banco';
 $lang->zpay_bank_account = 'Número de cuenta';
 $lang->zpay_bank_holder = 'Titular';
+$lang->zpay_bank_extra = 'Campos adicionales';
+$lang->zpay_bank_extra_help = 'Uno por línea con el formato "Etiqueta=Valor". Ej.: Código de banco=002, Número de tarjeta=1234-5678';
+$lang->zpay_bank_extra_ph = 'Código de banco=002';
 $lang->zpay_bank_due_days = 'Plazo de pago (días)';
 $lang->zpay_bank_due_days_help = 'Pasado ese plazo, el pedido caduca.';
 

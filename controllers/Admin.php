@@ -682,6 +682,7 @@ class Admin extends Base
 		$banks = is_array($vars->bank_name ?? null) ? $vars->bank_name : [];
 		$numbers = is_array($vars->bank_account ?? null) ? $vars->bank_account : [];
 		$holders = is_array($vars->bank_holder ?? null) ? $vars->bank_holder : [];
+		$extras = is_array($vars->bank_extra ?? null) ? $vars->bank_extra : [];
 
 		$accounts = [];
 		foreach ($banks as $index => $bank)
@@ -692,10 +693,28 @@ class Admin extends Base
 			{
 				continue;
 			}
+			// 추가 항목은 한 줄에 '이름=값'. 은행 코드, 카드번호 등 계좌번호 외 입금 정보
+			$extra = [];
+			foreach (preg_split('/\R/', (string)($extras[$index] ?? '')) as $line)
+			{
+				$pos = strpos($line, '=');
+				if ($pos === false)
+				{
+					continue;
+				}
+				$label = trim(substr($line, 0, $pos));
+				$value = trim(substr($line, $pos + 1));
+				if ($label === '' || $value === '')
+				{
+					continue;
+				}
+				$extra[] = ['label' => mb_substr($label, 0, 40), 'value' => mb_substr($value, 0, 80)];
+			}
 			$accounts[] = [
 				'bank' => mb_substr($bank, 0, 40),
 				'account' => mb_substr($number, 0, 60),
 				'holder' => mb_substr(trim((string)($holders[$index] ?? '')), 0, 40),
+				'extra' => $extra,
 			];
 		}
 		return $accounts;

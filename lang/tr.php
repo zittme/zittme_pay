@@ -108,6 +108,9 @@ $lang->zpay_bank_accounts_help = 'Yalnızca banka ve hesap numarası dolu satır
 $lang->zpay_bank_name = 'Banka';
 $lang->zpay_bank_account = 'Hesap numarası';
 $lang->zpay_bank_holder = 'Hesap sahibi';
+$lang->zpay_bank_extra = 'Ek alanlar';
+$lang->zpay_bank_extra_help = 'Her satıra bir tane, "Ad=Değer" biçiminde. Örn: Banka kodu=002, Kart numarası=1234-5678';
+$lang->zpay_bank_extra_ph = 'Banka kodu=002';
 $lang->zpay_bank_due_days = 'Ödeme süresi (gün)';
 $lang->zpay_bank_due_days_help = 'Bu süre dolduğunda sipariş süresi geçmiş sayılır.';
 

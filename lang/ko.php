@@ -108,6 +108,9 @@ $lang->zpay_bank_accounts_help = '은행과 계좌번호가 모두 채워진 줄
 $lang->zpay_bank_name = '은행';
 $lang->zpay_bank_account = '계좌번호';
 $lang->zpay_bank_holder = '예금주';
+$lang->zpay_bank_extra = '추가 항목';
+$lang->zpay_bank_extra_help = '한 줄에 하나씩 "이름=값" 형식으로 적습니다. 예: 은행 코드=002, 카드번호=1234-5678';
+$lang->zpay_bank_extra_ph = '은행 코드=002';
 $lang->zpay_bank_due_days = '입금 기한(일)';
 $lang->zpay_bank_due_days_help = '기한이 지나면 주문이 만료 처리됩니다.';
 

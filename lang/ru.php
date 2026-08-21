@@ -108,6 +108,9 @@ $lang->zpay_bank_accounts_help = 'Сохраняются только строк
 $lang->zpay_bank_name = 'Банк';
 $lang->zpay_bank_account = 'Номер счёта';
 $lang->zpay_bank_holder = 'Владелец счёта';
+$lang->zpay_bank_extra = 'Дополнительные поля';
+$lang->zpay_bank_extra_help = 'По одному в строке в формате «Название=Значение». Например: Код банка=002, Номер карты=1234-5678';
+$lang->zpay_bank_extra_ph = 'Код банка=002';
 $lang->zpay_bank_due_days = 'Срок оплаты (дней)';
 $lang->zpay_bank_due_days_help = 'По истечении срока заказ считается просроченным.';
 

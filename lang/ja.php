@@ -108,6 +108,9 @@ $lang->zpay_bank_accounts_help = '銀行と口座番号が両方入力された�
 $lang->zpay_bank_name = '銀行';
 $lang->zpay_bank_account = '口座番号';
 $lang->zpay_bank_holder = '口座名義';
+$lang->zpay_bank_extra = '追加項目';
+$lang->zpay_bank_extra_help = '1行に1つ「名前=値」の形式で入力します。例: 銀行コード=002、カード番号=1234-5678';
+$lang->zpay_bank_extra_ph = '銀行コード=002';
 $lang->zpay_bank_due_days = '入金期限（日）';
 $lang->zpay_bank_due_days_help = '期限を過ぎると注文は期限切れとして処理されます。';
 

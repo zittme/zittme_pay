@@ -108,6 +108,9 @@ $lang->zpay_bank_accounts_help = 'Seules les lignes comportant une banque et un 
 $lang->zpay_bank_name = 'Banque';
 $lang->zpay_bank_account = 'Numéro de compte';
 $lang->zpay_bank_holder = 'Titulaire';
+$lang->zpay_bank_extra = 'Champs supplémentaires';
+$lang->zpay_bank_extra_help = 'Un par ligne au format « Libellé=Valeur ». Ex. : Code banque=002, Numéro de carte=1234-5678';
+$lang->zpay_bank_extra_ph = 'Code banque=002';
 $lang->zpay_bank_due_days = 'Délai de paiement (jours)';
 $lang->zpay_bank_due_days_help = 'Passé ce délai, la commande expire.';
 

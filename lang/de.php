@@ -108,6 +108,9 @@ $lang->zpay_bank_accounts_help = 'Nur Zeilen mit Bank und Kontonummer werden ges
 $lang->zpay_bank_name = 'Bank';
 $lang->zpay_bank_account = 'Kontonummer';
 $lang->zpay_bank_holder = 'Kontoinhaber';
+$lang->zpay_bank_extra = 'Zusätzliche Angaben';
+$lang->zpay_bank_extra_help = 'Eine pro Zeile als "Bezeichnung=Wert". z. B. Bankcode=002, Kartennummer=1234-5678';
+$lang->zpay_bank_extra_ph = 'Bankcode=002';
 $lang->zpay_bank_due_days = 'Zahlungsfrist (Tage)';
 $lang->zpay_bank_due_days_help = 'Nach Ablauf dieser Frist verfällt die Bestellung.';
 

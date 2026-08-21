@@ -145,6 +145,7 @@ class Banktransfer extends Base
 				'bank' => $account['bank'] ?? '',
 				'account' => $account['account'] ?? '',
 				'holder' => $account['holder'] ?? '',
+				'bank_extra' => $account['extra'] ?? [],
 				'depositor_name' => mb_substr($depositor, 0, 80),
 				'due_date' => $due_date,
 			],
@@ -218,6 +219,7 @@ class Banktransfer extends Base
 				'bank' => trim((string)$account['bank']),
 				'account' => trim((string)$account['account']),
 				'holder' => trim((string)($account['holder'] ?? '')),
+				'extra' => is_array($account['extra'] ?? null) ? array_values($account['extra']) : [],
 			];
 		}
 		return $result;

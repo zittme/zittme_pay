@@ -108,6 +108,9 @@ $lang->zpay_bank_accounts_help = '只有同時填寫銀行與帳號的列才會�
 $lang->zpay_bank_name = '銀行';
 $lang->zpay_bank_account = '帳號';
 $lang->zpay_bank_holder = '戶名';
+$lang->zpay_bank_extra = '附加項目';
+$lang->zpay_bank_extra_help = '每行一項，格式為「名稱=值」。例如：銀行代碼=002、卡號=1234-5678';
+$lang->zpay_bank_extra_ph = '銀行代碼=002';
 $lang->zpay_bank_due_days = '付款期限（天）';
 $lang->zpay_bank_due_days_help = '超過期限後訂單將視為過期。';
 

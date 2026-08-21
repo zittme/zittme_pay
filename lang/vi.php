@@ -108,6 +108,9 @@ $lang->zpay_bank_accounts_help = 'Chỉ lưu những dòng có cả ngân hàng 
 $lang->zpay_bank_name = 'Ngân hàng';
 $lang->zpay_bank_account = 'Số tài khoản';
 $lang->zpay_bank_holder = 'Chủ tài khoản';
+$lang->zpay_bank_extra = 'Mục bổ sung';
+$lang->zpay_bank_extra_help = 'Mỗi dòng một mục theo dạng "Tên=Giá trị". VD: Mã ngân hàng=002, Số thẻ=1234-5678';
+$lang->zpay_bank_extra_ph = 'Mã ngân hàng=002';
 $lang->zpay_bank_due_days = 'Hạn thanh toán (ngày)';
 $lang->zpay_bank_due_days_help = 'Quá hạn thì đơn hàng sẽ được xử lý là hết hạn.';
 

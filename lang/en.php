@@ -108,6 +108,9 @@ $lang->zpay_bank_accounts_help = 'Only rows with both a bank and an account numb
 $lang->zpay_bank_name = 'Bank';
 $lang->zpay_bank_account = 'Account number';
 $lang->zpay_bank_holder = 'Account holder';
+$lang->zpay_bank_extra = 'Extra fields';
+$lang->zpay_bank_extra_help = 'One per line as "Label=Value". e.g. Bank code=002, Card number=1234-5678';
+$lang->zpay_bank_extra_ph = 'Bank code=002';
 $lang->zpay_bank_due_days = 'Payment window (days)';
 $lang->zpay_bank_due_days_help = 'The order expires once this period has passed.';
 

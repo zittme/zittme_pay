@@ -106,6 +106,7 @@
 			@if($order->extra['bank'] ?? '')
 			— {{ $order->extra['bank'] }} {{ $order->extra['account'] ?? '' }}
 			({{ $order->extra['depositor_name'] ?? ($order->extra['holder'] ?? '') }})
+			@foreach($order->extra['bank_extra'] ?? [] as $zpay_ex) / {{ $zpay_ex['label'] ?? '' }} {{ $zpay_ex['value'] ?? '' }}@endforeach
 			@endif
 		</p>
 		<form action="./" method="post">
