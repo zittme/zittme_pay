@@ -180,8 +180,8 @@
 				<div class="x_controls">
 					<select id="zpay_skin" name="skin">
 						<option value="/USE_DEFAULT/" @if (($zpay_instance->skin ?? '') === '/USE_DEFAULT/' || ($zpay_instance->skin ?? '') === '') selected @endif>기본 디자인 따름 (현재: {{ $zpay_default_skin }})</option>
-						@foreach ($zpay_skins as $zpay_sk)
-						<option value="{{ $zpay_sk->skin }}" @if (($zpay_instance->skin ?? '') === $zpay_sk->skin) selected @endif>{{ $zpay_sk->title ?: $zpay_sk->skin }}</option>
+						@foreach ($zpay_skins as $zpay_sk_name => $zpay_sk)
+						<option value="{{ $zpay_sk_name }}" @if (($zpay_instance->skin ?? '') === $zpay_sk_name) selected @endif>{{ $zpay_sk->title ?: $zpay_sk_name }}</option>
 						@endforeach
 					</select>
 					<p class="x_help-block">기본 디자인 따름으로 두면 사이트 디자인 설정(테마 적용 포함)의 스킨을 그대로 씁니다.</p>
