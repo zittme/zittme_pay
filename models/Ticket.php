@@ -42,7 +42,14 @@ class Ticket
 		if (!\Zittme\Framework\Storage::isDirectory($dir))
 		{
 			\Zittme\Framework\Storage::createDirectory($dir);
-			\Zittme\Framework\Storage::protectDirectory($dir);
+			if (method_exists('\\Zittme\\Framework\\Storage', 'protectDirectory'))
+			{
+				\Zittme\Framework\Storage::protectDirectory($dir);
+			}
+			else
+			{
+				file_put_contents($dir . '/.htaccess', "Deny from all\n");
+			}
 		}
 
 		return $dir;

@@ -282,3 +282,4 @@ $lang->zpay_conekta_reference = '참조번호 / CLABE';
 $lang->zpay_bank_due_date = '입금 기한';
 $lang->msg_conekta_manual_refund = '현금 · 계좌이체 결제는 Conekta 에서 자동 환불되지 않습니다. 수동 환불로 처리해 주세요.';
 $lang->msg_conekta_pending = 'Conekta 입금 안내가 등록되었습니다.';
+$lang->zpay_mode_unknown = '모드 확인 필요 (주문을 한 번 만들면 표시됩니다)';

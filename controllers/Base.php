@@ -4,6 +4,8 @@ namespace Zittme\Modules\Zittme_pay\Controllers;
 
 use Zittme\Modules\Zittme_pay\Models\Config as ConfigModel;
 
+require_once __DIR__ . '/../compat.php';
+
 /**
  * 짓미 페이 — 결제 엔진.
  *
@@ -128,18 +130,7 @@ class Base extends \ModuleObject
 	public function getSkinPath(): string
 	{
 		$skin = self::getSkinName();
-		$path = \Zittme\Framework\Theme::resolveSkinPath($this->module_path, $skin, 'skins');
-		if (!is_dir($path) && strpos($skin, \Zittme\Framework\Theme::SEPARATOR) === false)
-		{
-			foreach (array_keys(\Zittme\Framework\Theme::getModuleSkins('zittme_pay', 'skins')) as $combined)
-			{
-				if (substr($combined, -strlen(\Zittme\Framework\Theme::SEPARATOR . $skin)) === \Zittme\Framework\Theme::SEPARATOR . $skin)
-				{
-					$path = \Zittme\Framework\Theme::resolveSkinPath($this->module_path, $combined, 'skins');
-					break;
-				}
-			}
-		}
+		$path = zittme_compat_skin_path($this->module_path, $skin, 'zittme_pay');
 		if (!is_dir($path))
 		{
 			$path = $this->module_path . 'skins/default/';

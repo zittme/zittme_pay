@@ -115,7 +115,14 @@ class Install extends Base
 	{
 		$dir = \RX_BASEDIR . self::TICKET_DIR;
 		Storage::createDirectory($dir);
-		Storage::protectDirectory($dir);
+		if (method_exists(Storage::class, 'protectDirectory'))
+		{
+			Storage::protectDirectory($dir);
+		}
+		else
+		{
+			file_put_contents($dir . '/.htaccess', "Deny from all\n");
+		}
 	}
 
 	/**

@@ -282,3 +282,4 @@ $lang->zpay_conekta_reference = 'Reference / CLABE';
 $lang->zpay_bank_due_date = 'Pay by';
 $lang->msg_conekta_manual_refund = 'Cash and bank transfer payments cannot be refunded automatically through Conekta. Process a manual refund.';
 $lang->msg_conekta_pending = 'Conekta payment instructions registered.';
+$lang->zpay_mode_unknown = 'Mode unknown (shown after the first order)';

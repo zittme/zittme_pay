@@ -282,3 +282,4 @@ $lang->zpay_conekta_reference = 'Referencia / CLABE';
 $lang->zpay_bank_due_date = 'Pagar antes de';
 $lang->msg_conekta_manual_refund = 'Los pagos en efectivo y por transferencia no se reembolsan automáticamente en Conekta. Procese un reembolso manual.';
 $lang->msg_conekta_pending = 'Instrucciones de pago de Conekta registradas.';
+$lang->zpay_mode_unknown = 'Mode unknown (shown after the first order)';

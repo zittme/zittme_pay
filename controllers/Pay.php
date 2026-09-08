@@ -501,6 +501,10 @@ class Pay extends Base
 		{
 			Order::transition((int)$order->order_srl, Order::OPEN_STATUSES, $status);
 		}
+		elseif ($status === Order::STATUS_PENDING)
+		{
+			$this->settle($order, $driver, $verified);
+		}
 
 		$this->add('status', 'OK');
 	}

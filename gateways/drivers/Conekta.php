@@ -26,7 +26,7 @@ use Zittme\Modules\Zittme_pay\Models\Order;
 class Conekta extends Base
 {
 	protected const API_BASE = 'https://api.conekta.io';
-	protected const API_VERSION = '2.1.0';
+	protected const API_VERSION = '2.3.0';
 
 	/**
 	 * Conekta 가 결제를 받는 통화.
@@ -42,6 +42,8 @@ class Conekta extends Base
 	 * 호스티드 결제 페이지 만료 (초).
 	 */
 	protected const CHECKOUT_TTL = 86400 * 3;
+
+	protected ?bool $livemode = null;
 
 	public function getName(): string
 	{
@@ -123,9 +125,11 @@ class Conekta extends Base
 		// Conekta 는 customer_info 의 name · email · phone 을 모두 요구한다
 		$phone = preg_replace('/[^0-9+]/', '', (string)($order->payer_phone ?? ''));
 		$customer = [
+			'object' => 'customer_info',
 			'name' => mb_substr(trim((string)($order->payer_name ?? '')) ?: 'Customer', 0, 80),
 			'email' => trim((string)($order->payer_email ?? '')) ?: 'noreply@' . $this->hostName(),
 			'phone' => $phone !== '' ? $phone : '+5200000000',
+			'corporate' => false,
 		];
 
 		[$ok, $status_code, $body, $parsed] = $this->api('/orders', 'POST', [
@@ -133,7 +137,7 @@ class Conekta extends Base
 			'customer_info' => $customer,
 			'line_items' => [[
 				'name' => mb_substr((string)$order->title ?: (string)$order->order_code, 0, 250),
-				'unit_price' => $fx['minor'],
+				'unit_price' => (int)$fx['minor'],
 				'quantity' => 1,
 			]],
 			'metadata' => [
@@ -270,7 +274,7 @@ class Conekta extends Base
 		$minor = (int)($parsed['amount'] ?? 0);
 
 		$charge = (array)($parsed['charges']['data'][0] ?? []);
-		$method = (string)($charge['payment_method']['type'] ?? $charge['payment_method']['object'] ?? '');
+		$method = (string)($charge['payment_method']['object'] ?? '') === 'card_payment' ? 'card' : (string)($charge['payment_method']['type'] ?? $charge['payment_method']['object'] ?? '');
 		$method = $this->normalizeMethod($method);
 
 		if ($order !== null)
@@ -360,7 +364,7 @@ class Conekta extends Base
 	protected function normalizeMethod(string $type): string
 	{
 		$type = strtolower($type);
-		if (strpos($type, 'card') !== false)
+		if (strpos($type, 'card') !== false || in_array($type, ['credit', 'debit', 'prepaid'], true))
 		{
 			return 'card';
 		}
@@ -438,7 +442,7 @@ class Conekta extends Base
 			'currency' => (string)($ck['currency'] ?? (strtoupper(trim((string)$this->config->conekta_currency)) ?: 'MXN')),
 			'minor' => (int)($ck['minor'] ?? 0),
 			'rate' => (float)($ck['rate'] ?? 0),
-			'method' => (string)($ck['method'] ?? ''),
+			'method' => $this->normalizeMethod((string)($ck['method'] ?? '')),
 		];
 	}
 
@@ -453,11 +457,17 @@ class Conekta extends Base
 			return [false, 0, lang('zittme_pay.msg_conekta_test_empty'), []];
 		}
 
-		return $this->request(self::API_BASE . $path, $method, $data === null ? null : json_encode($data, \JSON_UNESCAPED_UNICODE), [
-			'Authorization' => 'Basic ' . base64_encode($key . ':'),
+		$result = $this->request(self::API_BASE . $path, $method, $data === null ? null : json_encode($data, \JSON_UNESCAPED_UNICODE), [
+			'Authorization' => 'Bearer ' . $key,
 			'Accept' => 'application/vnd.conekta-v' . self::API_VERSION . '+json',
+			'Accept-Language' => 'en',
 			'Content-Type' => 'application/json',
 		]);
+		if (is_array($result[3] ?? null) && array_key_exists('livemode', $result[3]))
+		{
+			$this->livemode = (bool)$result[3]['livemode'];
+		}
+		return $result;
 	}
 
 	/**
@@ -473,6 +483,11 @@ class Conekta extends Base
 		[$ok, $status, $body, $parsed] = $this->api('/orders?limit=1', 'GET');
 		if ($ok)
 		{
+			$first = (string)($parsed['data'][0]['id'] ?? '');
+			if ($first !== '')
+			{
+				$this->api('/orders/' . rawurlencode($first), 'GET');
+			}
 			return '';
 		}
 		if ($status === 401 || $status === 403)
@@ -492,7 +507,15 @@ class Conekta extends Base
 	public function modeLabel(): string
 	{
 		$key = trim((string)$this->config->conekta_private_key);
-		return lang(strpos($key, 'key_test') === 0 ? 'zittme_pay.paypal_mode_sandbox' : 'zittme_pay.paypal_mode_live');
+		if (strpos($key, 'key_test') === 0 || $this->livemode === false)
+		{
+			return lang('zittme_pay.paypal_mode_sandbox');
+		}
+		if ($this->livemode === true)
+		{
+			return lang('zittme_pay.paypal_mode_live');
+		}
+		return lang('zittme_pay.zpay_mode_unknown');
 	}
 
 	protected function hostName(): string

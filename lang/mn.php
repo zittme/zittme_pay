@@ -282,3 +282,4 @@ $lang->zpay_conekta_reference = 'Лавлагаа / CLABE';
 $lang->zpay_bank_due_date = 'Төлөх хугацаа';
 $lang->msg_conekta_manual_refund = 'Бэлэн мөнгө, шилжүүлгийн төлбөрийг Conekta автоматаар буцаадаггүй. Гараар буцаана уу.';
 $lang->msg_conekta_pending = 'Conekta төлбөрийн заавар бүртгэгдлээ.';
+$lang->zpay_mode_unknown = 'Mode unknown (shown after the first order)';

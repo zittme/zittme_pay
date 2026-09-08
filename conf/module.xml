@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module>
 
+	<namespaces>
+		<namespace name="Zittme\Modules\Zittme_pay" />
+	</namespaces>
+
 	<!--
 	  grant 를 두지 않는다.
 

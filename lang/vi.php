@@ -282,3 +282,4 @@ $lang->zpay_conekta_reference = 'Mã tham chiếu / CLABE';
 $lang->zpay_bank_due_date = 'Hạn thanh toán';
 $lang->msg_conekta_manual_refund = 'Thanh toán tiền mặt và chuyển khoản không hoàn tiền tự động qua Conekta. Hãy hoàn tiền thủ công.';
 $lang->msg_conekta_pending = 'Đã đăng ký hướng dẫn thanh toán Conekta.';
+$lang->zpay_mode_unknown = 'Mode unknown (shown after the first order)';

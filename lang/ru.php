@@ -282,3 +282,4 @@ $lang->zpay_conekta_reference = 'Референс / CLABE';
 $lang->zpay_bank_due_date = 'Оплатить до';
 $lang->msg_conekta_manual_refund = 'Платежи наличными и переводом нельзя вернуть через Conekta автоматически. Оформите возврат вручную.';
 $lang->msg_conekta_pending = 'Инструкция по оплате Conekta зарегистрирована.';
+$lang->zpay_mode_unknown = 'Mode unknown (shown after the first order)';

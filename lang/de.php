@@ -282,3 +282,4 @@ $lang->zpay_conekta_reference = 'Referenz / CLABE';
 $lang->zpay_bank_due_date = 'Zahlbar bis';
 $lang->msg_conekta_manual_refund = 'Bargeld- und Überweisungszahlungen können über Conekta nicht automatisch erstattet werden. Bitte manuell erstatten.';
 $lang->msg_conekta_pending = 'Conekta-Zahlungsanweisung registriert.';
+$lang->zpay_mode_unknown = 'Mode unknown (shown after the first order)';

@@ -282,3 +282,4 @@ $lang->zpay_conekta_reference = '参照番号 / CLABE';
 $lang->zpay_bank_due_date = '入金期限';
 $lang->msg_conekta_manual_refund = '現金・振込の決済は Conekta で自動返金できません。手動で返金してください。';
 $lang->msg_conekta_pending = 'Conekta の入金案内を登録しました。';
+$lang->zpay_mode_unknown = 'モード未確認 (最初の注文後に表示)';

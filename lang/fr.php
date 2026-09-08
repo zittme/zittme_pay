@@ -282,3 +282,4 @@ $lang->zpay_conekta_reference = 'Référence / CLABE';
 $lang->zpay_bank_due_date = 'Payer avant le';
 $lang->msg_conekta_manual_refund = 'Les paiements en espèces et par virement ne peuvent pas être remboursés automatiquement via Conekta. Effectuez un remboursement manuel.';
 $lang->msg_conekta_pending = 'Instructions de paiement Conekta enregistrées.';
+$lang->zpay_mode_unknown = 'Mode unknown (shown after the first order)';

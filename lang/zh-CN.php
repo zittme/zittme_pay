@@ -282,3 +282,4 @@ $lang->zpay_conekta_reference = '参考号 / CLABE';
 $lang->zpay_bank_due_date = '付款期限';
 $lang->msg_conekta_manual_refund = '现金与转账付款无法通过 Conekta 自动退款，请手动退款。';
 $lang->msg_conekta_pending = '已登记 Conekta 付款说明。';
+$lang->zpay_mode_unknown = '模式未知 (首次下单后显示)';

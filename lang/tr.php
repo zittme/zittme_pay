@@ -282,3 +282,4 @@ $lang->zpay_conekta_reference = 'Referans / CLABE';
 $lang->zpay_bank_due_date = 'Son ödeme';
 $lang->msg_conekta_manual_refund = 'Nakit ve havale ödemeleri Conekta üzerinden otomatik iade edilemez. Manuel iade yapın.';
 $lang->msg_conekta_pending = 'Conekta ödeme talimatı kaydedildi.';
+$lang->zpay_mode_unknown = 'Mode unknown (shown after the first order)';
