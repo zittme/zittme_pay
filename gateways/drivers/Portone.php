@@ -42,9 +42,23 @@ class Portone extends Base
 		'FAILED' => Order::STATUS_FAILED,
 	];
 
+	/**
+	 * 포트원 V2 결제창 수단 값.
+	 */
+	public const PAY_METHODS = ['CARD', 'VIRTUAL_ACCOUNT', 'TRANSFER', 'MOBILE', 'EASY_PAY'];
+
 	public function getName(): string
 	{
 		return 'portone';
+	}
+
+	/**
+	 * 설정값을 SDK 가 받는 수단 이름으로 정리한다. 모르는 값이면 카드.
+	 */
+	public static function normalizePayMethod(string $value): string
+	{
+		$value = strtoupper(trim($value));
+		return in_array($value, self::PAY_METHODS, true) ? $value : 'CARD';
 	}
 
 	public function isConfigured(): bool
@@ -76,23 +90,32 @@ class Portone extends Base
 		$state = $state !== '' ? $state : (string)\Context::get('pay_state');
 		$currency = strtoupper(trim((string)($order->currency ?? ''))) ?: 'KRW';
 
-		return [
+		// 포트원은 빈 문자열을 거부한다 (NON_EMPTY_STRING). 값이 있는 항목만 넣는다.
+		$customer = array_filter([
+			'fullName' => trim((string)$order->payer_name),
+			'email' => trim((string)$order->payer_email),
+			'phoneNumber' => preg_replace('/[^0-9]/', '', (string)$order->payer_phone),
+		], 'strlen');
+
+		$request = [
 			'storeId' => trim((string)$this->config->portone_store_id),
 			'channelKey' => trim((string)$this->config->portone_channel_key),
 			'paymentId' => (string)$order->order_code,
 			'orderName' => mb_substr((string)$order->title, 0, 100) ?: (string)$order->order_code,
 			'totalAmount' => (int)$order->amount,
 			'currency' => 'CURRENCY_' . $currency,
-			'customer' => [
-				'fullName' => (string)$order->payer_name,
-				'email' => (string)$order->payer_email,
-				'phoneNumber' => preg_replace('/[^0-9]/', '', (string)$order->payer_phone),
-			],
+			// V2 SDK 필수값. 어느 수단을 열지는 관리자 설정에서 고른다 (기본 카드).
+			'payMethod' => self::normalizePayMethod((string)$this->config->portone_pay_method),
 			'redirectUrl' => Base::buildActionUrl('procZittme_payCallback', [
 				'gateway' => 'portone',
 				'state' => $state,
 			]),
 		];
+		if ($customer)
+		{
+			$request['customer'] = $customer;
+		}
+		return $request;
 	}
 
 	/**

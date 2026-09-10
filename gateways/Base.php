@@ -280,6 +280,22 @@ abstract class Base
 	 */
 	public function getTitle(): string
 	{
+		// 관리자가 정한 표시 이름이 있으면 그것을 쓴다. "포트원" 같은 PG 이름 대신
+		// "신용카드 · 간편결제" 처럼 고객이 고르는 말로 바꿔 보여 주기 위해서다.
+		$labels = ConfigModel::getConfig()->gateway_labels;
+		$custom = is_array($labels) ? trim((string)($labels[$this->getName()] ?? '')) : '';
+		if ($custom !== '')
+		{
+			return $custom;
+		}
+		return $this->getDefaultTitle();
+	}
+
+	/**
+	 * 언어 파일의 기본 이름 (관리자 설정의 자리표시자로 쓴다).
+	 */
+	public function getDefaultTitle(): string
+	{
 		$title = lang('zittme_pay.gateway_' . $this->getName());
 		return ($title && $title !== 'gateway_' . $this->getName()) ? $title : $this->getName();
 	}

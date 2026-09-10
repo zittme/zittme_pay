@@ -31,11 +31,11 @@ class Admin extends Base
 			'log_retention_days', 'webhook_ip_whitelist', 'biz_notice',
 		],
 		'gateway' => [
-			'enabled_gateways', 'toss_client_key', 'toss_secret_key',
+			'enabled_gateways', 'gateway_labels', 'toss_client_key', 'toss_secret_key',
 			'inicis_mid', 'inicis_sign_key', 'inicis_api_key',
 			'kcp_site_cd', 'kcp_cert_info', 'kcp_priv_key', 'kcp_priv_pass',
 			'nicepay_client_id', 'nicepay_secret_key',
-			'portone_store_id', 'portone_channel_key', 'portone_api_secret',
+			'portone_store_id', 'portone_channel_key', 'portone_api_secret', 'portone_pay_method',
 			'paypal_client_id', 'paypal_secret', 'paypal_currency', 'paypal_exchange_rate', 'paypal_allow_krw',
 			'conekta_private_key', 'conekta_webhook_secret', 'conekta_currency', 'conekta_methods', 'conekta_allow_krw',
 			'exchange_rates', 'exchange_rates_manual', 'exchange_auto', 'exchange_source', 'exchange_api_key',
@@ -158,6 +158,7 @@ class Admin extends Base
 			$drivers[$name] = [
 				'name' => $name,
 				'title' => $driver->getTitle(),
+				'default_title' => $driver->getDefaultTitle(),
 				'configured' => $driver->isConfigured(),
 				'enabled' => in_array($name, $config->enabled_gateways, true),
 			];
@@ -590,6 +591,21 @@ class Admin extends Base
 			$value = is_array($value) ? $value : [];
 			// 우리가 아는 드라이버 이름만 남긴다.
 			return array_values(array_intersect(Gateway::$supported_gateways, array_map('strval', $value)));
+		}
+
+		if ($key === 'gateway_labels')
+		{
+			// 드라이버 이름 => 표시 이름. 아는 드라이버만, 빈 값은 버린다(기본 이름 사용).
+			$labels = [];
+			foreach (is_array($value) ? $value : [] as $name => $label)
+			{
+				$label = trim(strip_tags((string)$label));
+				if (in_array((string)$name, Gateway::$supported_gateways, true) && $label !== '')
+				{
+					$labels[(string)$name] = mb_substr($label, 0, 60);
+				}
+			}
+			return $labels;
 		}
 
 		if ($key === 'bank_accounts')

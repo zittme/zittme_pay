@@ -27,12 +27,38 @@
 				<dd>{{ $order->payer_name }}</dd>
 			</div>
 			@endif
+			@if($order->payer_phone)
+			<div class="zpay-summary-row">
+				<dt>{{ $lang->zpay_payer_phone }}</dt>
+				<dd>{{ $order->payer_phone }}</dd>
+			</div>
+			@endif
 			<div class="zpay-summary-row zpay-summary-total">
 				<dt>{{ $lang->zpay_amount }}</dt>
 				<dd><strong>{{ $amount_text }}</strong></dd>
 			</div>
 		</dl>
 	</section>
+
+	{{-- 구매자 정보는 주문을 만든 모듈이 받는 것이 원칙이다. --}}
+	{{-- 이름·휴대폰이 비어 온 주문에만 여기서 받아 채운다 (PG 가 휴대폰 번호를 요구한다). --}}
+	@if(!$order->payer_name || !$order->payer_phone)
+	<section class="zpay-buyer">
+		<h2 class="zpay-section-title">{{ $lang->zpay_buyer_info }}</h2>
+		<p class="zpay-field">
+			<label for="zpay-payer-name">{{ $lang->zpay_payer }} <em class="zpay-req">*</em></label>
+			<input type="text" id="zpay-payer-name" name="payer_name" value="{{ $order->payer_name }}" maxlength="80" autocomplete="name">
+		</p>
+		<p class="zpay-field">
+			<label for="zpay-payer-phone">{{ $lang->zpay_payer_phone }} <em class="zpay-req">*</em></label>
+			<input type="tel" id="zpay-payer-phone" name="payer_phone" value="{{ $order->payer_phone }}" maxlength="20" inputmode="tel" autocomplete="tel" placeholder="010-0000-0000">
+		</p>
+		<p class="zpay-field">
+			<label for="zpay-payer-email">{{ $lang->zpay_payer_email }}</label>
+			<input type="email" id="zpay-payer-email" name="payer_email" value="{{ $order->payer_email }}" maxlength="250" autocomplete="email">
+		</p>
+	</section>
+	@endif
 
 	<section class="zpay-methods">
 		<h2 class="zpay-section-title">{{ $lang->zpay_select_method }}</h2>

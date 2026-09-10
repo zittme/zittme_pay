@@ -30,6 +30,8 @@ class Config
 		// 2. 결제수단
 		// 활성화된 드라이버 이름 목록. 여기 없는 드라이버는 결제 화면에 뜨지 않는다.
 		'enabled_gateways' => ['banktransfer'],
+		// 결제수단 표시 이름 (드라이버 이름 => 고객에게 보이는 이름). 비우면 언어 파일 기본값.
+		'gateway_labels' => [],
 		'toss_client_key' => '',
 		'toss_secret_key' => '',
 		// KG이니시스 (INIStdPay). 취소는 INIAPI 라 키가 따로 있다.
@@ -49,6 +51,7 @@ class Config
 		'portone_store_id' => '',
 		'portone_channel_key' => '',
 		'portone_api_secret' => '',
+		'portone_pay_method' => 'CARD',
 		'paypal_client_id' => '',
 		'paypal_secret' => '',
 		// 페이팔은 KRW 를 지원하지 않는다. 이 통화로 환산해 결제한다.
@@ -132,7 +135,7 @@ class Config
 			}
 
 			// 배열로 쓰는 값은 문자열로 저장돼 있어도 배열로 정규화한다.
-			foreach (['enabled_gateways', 'bank_accounts', 'exchange_rates', 'exchange_rates_manual', 'extra_currencies', 'conekta_methods'] as $key)
+			foreach (['enabled_gateways', 'gateway_labels', 'bank_accounts', 'exchange_rates', 'exchange_rates_manual', 'extra_currencies', 'conekta_methods'] as $key)
 			{
 				if (!is_array($config->{$key}))
 				{

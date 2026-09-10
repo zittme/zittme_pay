@@ -34,7 +34,8 @@
 		  주의: 속성 이름은 check-csrf (하이픈) 다. check_csrf 로 적으면 파서가 무시해서
 		     CSRF 검사가 그대로 켜진 채 콜백이 막힌다.
 		-->
-		<action name="procZittme_payCallback" class="Controllers\Pay" standalone="true" check-csrf="false" />
+		<!-- PG 복귀는 GET(포트원 리다이렉트·SDK 콜백)일 수도, POST(나이스페이 인증 결과)일 수도 있다 -->
+		<action name="procZittme_payCallback" class="Controllers\Pay" standalone="true" check-csrf="false" method="GET|POST" />
 		<action name="procZittme_payWebhook" class="Controllers\Pay" standalone="true" check-csrf="false" />
 
 		<!-- 관리자 -->

@@ -115,6 +115,10 @@ class Pay extends Base
 			'order_code' => $order->order_code,
 			'amount' => (int)$order->amount,
 			'gateways' => $gateway_info,
+			'msg' => [
+				'payer_name_required' => lang('zittme_pay.msg_payer_name_required'),
+				'payer_phone_required' => lang('zittme_pay.msg_payer_phone_required'),
+			],
 		], \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES));
 
 		foreach ($client_scripts as $script)
@@ -166,8 +170,36 @@ class Pay extends Base
 		}
 		$driver = $drivers[$gateway_name];
 
-		// 고른 결제수단을 주문에 기록해 둔다. 콜백이 어느 드라이버로 승인할지 여기서 정해진다.
-		Order::update((int)$order->order_srl, ['gateway' => $gateway_name]);
+		// 구매자 정보. 결제 화면에서 받은 값을 주문에 저장한다. 이름은 필수, 휴대폰은
+		// 결제창을 쓰는 PG(이니시스 등)가 요구하므로 그 경우 필수.
+		$fields = ['gateway' => $gateway_name];
+		if (\Context::get('payer_name') !== null)
+		{
+			$payer_name = trim((string)\Context::get('payer_name'));
+			$payer_phone = trim((string)\Context::get('payer_phone'));
+			$payer_email = trim((string)\Context::get('payer_email'));
+			if ($payer_name === '')
+			{
+				throw new \Zittme\Framework\Exception('zittme_pay.msg_payer_name_required');
+			}
+			if ($driver->requiresClientPayment() && strlen(preg_replace('/[^0-9]/', '', $payer_phone)) < 9)
+			{
+				throw new \Zittme\Framework\Exception('zittme_pay.msg_payer_phone_required');
+			}
+			if ($payer_email !== '' && !filter_var($payer_email, FILTER_VALIDATE_EMAIL))
+			{
+				throw new \Zittme\Framework\Exception('zittme_pay.msg_payer_email_invalid');
+			}
+			$fields['payer_name'] = mb_substr($payer_name, 0, 80);
+			$fields['payer_phone'] = mb_substr($payer_phone, 0, 20);
+			$fields['payer_email'] = mb_substr($payer_email, 0, 250);
+			$order->payer_name = $fields['payer_name'];
+			$order->payer_phone = $fields['payer_phone'];
+			$order->payer_email = $fields['payer_email'];
+		}
+
+		// 고른 결제수단과 구매자 정보를 주문에 기록해 둔다. 콜백이 어느 드라이버로 승인할지 여기서 정해진다.
+		Order::update((int)$order->order_srl, $fields);
 
 		if ($driver->requiresClientPayment())
 		{
@@ -415,8 +447,9 @@ class Pay extends Base
 			// charge.* 이벤트는 charge 객체라 order_id 로 주문을 가리킨다
 			$data['tid'] = (string)($data['order_id'] ?? $data['id'] ?? '');
 		}
-		$order_code = (string)($data['orderId'] ?? $data['order_code'] ?? '');
-		$tid = (string)($data['paymentKey'] ?? $data['tid'] ?? '');
+		// 포트원 V2 는 {type, data:{storeId, paymentId, transactionId}} 로 보낸다. paymentId = order_code
+		$order_code = (string)($data['orderId'] ?? $data['order_code'] ?? $data['paymentId'] ?? '');
+		$tid = (string)($data['paymentKey'] ?? $data['tid'] ?? $data['paymentId'] ?? '');
 
 		$order = Order::getByCode($order_code);
 		if (!$order)

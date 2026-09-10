@@ -26,6 +26,19 @@
 			</div>
 		</div>
 
+		<div class="x_control-group">
+			<label class="x_control-label">{{ $lang->zpay_gateway_label }}</label>
+			<div class="x_controls">
+				@foreach($drivers as $driver_name => $driver)
+				<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+					<span style="min-width:120px">{{ $driver['default_title'] ?? $driver['title'] }}</span>
+					<input type="text" name="gateway_labels[{{ $driver_name }}]" value="{{ $pay_config->gateway_labels[$driver_name] ?? '' }}" placeholder="{{ $driver['default_title'] ?? $driver['title'] }}" maxlength="60" style="max-width:320px" />
+				</div>
+				@endforeach
+				<p class="x_help-block">{{ $lang->zpay_gateway_label_help }}</p>
+			</div>
+		</div>
+
 		<h3>{{ $lang->gateway_toss }}</h3>
 
 		<div class="x_control-group">
@@ -217,6 +230,18 @@
 			<div class="x_controls">
 				<input type="password" id="zpay_portone_api_secret" name="portone_api_secret" value="{{ $pay_config->portone_api_secret }}" class="x_full-width" autocomplete="off" />
 				<p class="x_help-block">{{ $lang->zpay_portone_key_help }}</p>
+			</div>
+		</div>
+
+		<div class="x_control-group">
+			<label class="x_control-label" for="zpay_portone_pay_method">{{ $lang->zpay_portone_pay_method }}</label>
+			<div class="x_controls">
+				<select id="zpay_portone_pay_method" name="portone_pay_method">
+					@foreach(['CARD', 'VIRTUAL_ACCOUNT', 'TRANSFER', 'MOBILE', 'EASY_PAY'] as $zpm)
+					<option value="{{ $zpm }}" @if(strtoupper((string)$pay_config->portone_pay_method ?: 'CARD') === $zpm) selected="selected" @endif>{{ $lang->zpay_portone_pay_methods[$zpm] ?? $zpm }}</option>
+					@endforeach
+				</select>
+				<p class="x_help-block">{{ $lang->zpay_portone_pay_method_help }}</p>
 			</div>
 		</div>
 

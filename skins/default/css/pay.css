@@ -356,3 +356,12 @@ a.zpay-btn-primary:hover {
 .zpay-methods .zpay-section-title { margin-bottom: 12px; }
 .zpay-summary { margin: 22px 0 26px; }
 .zpay-summary .zpay-section-title { margin-bottom: 12px; }
+
+.zpay-buyer {
+	margin-top: 22px;
+}
+
+.zpay-req {
+	color: #d64545;
+	font-style: normal;
+}

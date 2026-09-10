@@ -232,6 +232,7 @@
 				orderName: payload.orderName,
 				totalAmount: payload.totalAmount,
 				currency: payload.currency,
+				payMethod: payload.payMethod || 'CARD',
 				customer: payload.customer,
 				redirectUrl: payload.redirectUrl
 			}).then(function(response) {
@@ -266,6 +267,30 @@
 			state: boot.state,
 			gateway: gatewayName
 		};
+
+		// 구매자 정보. 이름·휴대폰은 PG 가 요구하므로 여기서 먼저 막는다.
+		var payerName = document.getElementById('zpay-payer-name');
+		var payerPhone = document.getElementById('zpay-payer-phone');
+		var payerEmail = document.getElementById('zpay-payer-email');
+		if (payerName) {
+			params.payer_name = payerName.value.trim();
+			params.payer_phone = payerPhone ? payerPhone.value.trim() : '';
+			params.payer_email = payerEmail ? payerEmail.value.trim() : '';
+			if (!params.payer_name) {
+				showError(boot.msg && boot.msg.payer_name_required ? boot.msg.payer_name_required : 'name required');
+				setBusy(false);
+				payerName.focus();
+				return;
+			}
+			if (gatewayName !== 'banktransfer' && params.payer_phone.replace(/[^0-9]/g, '').length < 9) {
+				showError(boot.msg && boot.msg.payer_phone_required ? boot.msg.payer_phone_required : 'phone required');
+				setBusy(false);
+				if (payerPhone) {
+					payerPhone.focus();
+				}
+				return;
+			}
+		}
 
 		if (gatewayName === 'banktransfer') {
 			var bankIndex = root.querySelector('input[name="zpay_bank_index"]:checked');
