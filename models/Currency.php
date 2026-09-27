@@ -213,7 +213,7 @@ class Currency
 		$currency = strtoupper(trim($currency)) ?: 'KRW';
 		if ($currency === 'KRW')
 		{
-			return number_format($minor) . '원';
+			return \Context::getLangType() === 'ko' ? number_format($minor) . '원' : '₩' . number_format($minor);
 		}
 		return self::format(self::fromMinor($minor, $currency), $currency);
 	}
