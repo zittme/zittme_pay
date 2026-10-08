@@ -4,7 +4,7 @@
 	<h2>{{ $lang->zpay_tab_gateway }}</h2>
 	<p class="x_help-block">{{ $lang->about_zpay_gateway }}</p>
 
-	<form action="./" method="post" class="x_form-horizontal">
+	<form action="./" method="post" class="x_form-horizontal" enctype="multipart/form-data">
 		<input type="hidden" name="module" value="zittme_pay" />
 		<input type="hidden" name="act" value="procZittme_payAdminInsertConfig" />
 		<input type="hidden" name="tab" value="gateway" />
@@ -36,6 +36,23 @@
 				</div>
 				@endforeach
 				<p class="x_help-block">{{ $lang->zpay_gateway_label_help }}</p>
+			</div>
+		</div>
+
+		<div class="x_control-group">
+			<label class="x_control-label">{{ $lang->zpay_gateway_logo }}</label>
+			<div class="x_controls">
+				@foreach($drivers as $driver_name => $driver)
+				<div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:8px">
+					<span style="min-width:120px">{{ $driver['default_title'] ?? $driver['title'] }}</span>
+					@if(!empty($driver['logo']))
+					<span style="display:inline-flex;align-items:center;justify-content:center;height:36px;min-width:64px;padding:4px 10px;background:#fff;border:1px solid #d0d5dd;border-radius:6px;box-sizing:border-box"><img src="{{ $driver['logo'] }}" alt="{{ $driver['title'] }}" style="max-height:26px;max-width:120px;display:block" /></span>
+					<label class="x_inline"><input type="checkbox" name="gateway_logo_delete[{{ $driver_name }}]" value="Y" /> {{ $lang->zpay_gateway_logo_delete }}</label>
+					@endif
+					<input type="file" name="gateway_logo_file[{{ $driver_name }}]" accept=".png,.jpg,.jpeg,.gif,.webp,image/png,image/jpeg,image/gif,image/webp" />
+				</div>
+				@endforeach
+				<p class="x_help-block">{{ $lang->zpay_gateway_logo_help }}</p>
 			</div>
 		</div>
 
@@ -353,6 +370,57 @@
 			</div>
 		</div>
 
+		<h3>{{ $lang->gateway_paddle }}</h3>
+		<p class="x_help-block">{{ $lang->zpay_paddle_about }}</p>
+
+		<div class="x_control-group">
+			<label class="x_control-label">{{ $lang->zpay_paddle_mode }}</label>
+			<div class="x_controls">
+				<label class="x_inline">
+					<input type="radio" name="paddle_mode" value="sandbox" @if (($pay_config->paddle_mode ?? 'sandbox') !== 'live') checked @endif />
+					{{ $lang->paypal_mode_sandbox }}
+				</label>
+				<label class="x_inline">
+					<input type="radio" name="paddle_mode" value="live" @if (($pay_config->paddle_mode ?? 'sandbox') === 'live') checked @endif />
+					{{ $lang->paypal_mode_live }}
+				</label>
+				<p class="x_help-block">{{ $lang->zpay_paddle_mode_help }}</p>
+			</div>
+		</div>
+
+		<div class="x_control-group">
+			<label class="x_control-label" for="zpay_paddle_api_key">{{ $lang->zpay_paddle_api_key }}</label>
+			<div class="x_controls">
+				<input type="password" id="zpay_paddle_api_key" name="paddle_api_key" value="{{ $pay_config->paddle_api_key ?? '' }}" class="x_full-width" autocomplete="off" />
+				<p class="x_help-block">{{ $lang->zpay_paddle_api_key_help }}</p>
+				<p><button type="button" class="x_btn" id="zpayPaddleTest">{{ $lang->zpay_paypal_test }}</button></p>
+			</div>
+		</div>
+
+		<div class="x_control-group">
+			<label class="x_control-label" for="zpay_paddle_client_token">{{ $lang->zpay_paddle_client_token }}</label>
+			<div class="x_controls">
+				<input type="text" id="zpay_paddle_client_token" name="paddle_client_token" value="{{ $pay_config->paddle_client_token ?? '' }}" class="x_full-width" autocomplete="off" />
+				<p class="x_help-block">{{ $lang->zpay_paddle_client_token_help }}</p>
+			</div>
+		</div>
+
+		<div class="x_control-group">
+			<label class="x_control-label" for="zpay_paddle_webhook_secret">{{ $lang->zpay_paddle_webhook_secret }}</label>
+			<div class="x_controls">
+				<input type="password" id="zpay_paddle_webhook_secret" name="paddle_webhook_secret" value="{{ $pay_config->paddle_webhook_secret ?? '' }}" class="x_full-width" autocomplete="off" />
+				<p class="x_help-block">{{ $lang->zpay_paddle_webhook_secret_help }}</p>
+			</div>
+		</div>
+
+		<div class="x_control-group">
+			<label class="x_control-label">{{ $lang->zpay_paddle_webhook }}</label>
+			<div class="x_controls">
+				<input type="text" readonly value="{{ \Zittme\Modules\Zittme_pay\Gateways\Base::buildActionUrl('procZittme_payWebhook', ['gateway' => 'paddle']) }}" class="x_full-width" onclick="this.select()" />
+				<p class="x_help-block">{{ $lang->zpay_paddle_webhook_help }}</p>
+			</div>
+		</div>
+
 		<h3>{{ $lang->gateway_banktransfer }}</h3>
 
 		<div class="x_control-group">
@@ -447,6 +515,27 @@
 		btn.disabled = true;
 		exec_json('zittme_pay.procZittme_payAdminTestConekta', {
 			conekta_private_key: document.getElementById('zpay_conekta_private_key').value
+		}, function (ret) {
+			alert(ret.message);
+		}, function (ret) {
+			alert(ret.message);
+		}).always(function () {
+			btn.textContent = label;
+			btn.disabled = false;
+		});
+	});
+})();
+(function () {
+	var btn = document.getElementById('zpayPaddleTest');
+	if (!btn) return;
+	btn.addEventListener('click', function () {
+		var label = btn.textContent;
+		var mode = document.querySelector('input[name="paddle_mode"]:checked');
+		btn.textContent = {!! json_encode($lang->zpay_paypal_testing) !!};
+		btn.disabled = true;
+		exec_json('zittme_pay.procZittme_payAdminTestPaddle', {
+			paddle_api_key: document.getElementById('zpay_paddle_api_key').value,
+			paddle_mode: mode ? mode.value : 'sandbox'
 		}, function (ret) {
 			alert(ret.message);
 		}, function (ret) {

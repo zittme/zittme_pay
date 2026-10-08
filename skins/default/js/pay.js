@@ -250,6 +250,48 @@
 			return;
 		}
 
+		if (gatewayName === 'paddle') {
+			if (!window.Paddle || !window.Paddle.Checkout || typeof window.Paddle.Initialize !== 'function') {
+				showError('Paddle.js not loaded');
+				setBusy(false);
+				return;
+			}
+			// Initialize 는 페이지당 한 번만 부른다. 결과 확정은 서버 콜백(재조회 검증)이 한다
+			if (!window.__zpayPaddleReady) {
+				if (payload.environment === 'sandbox') {
+					window.Paddle.Environment.set('sandbox');
+				}
+				window.Paddle.Initialize({
+					token: payload.clientToken,
+					eventCallback: function(event) {
+						var current = window.__zpayPaddlePayload || {};
+						if (!event || !event.name) {
+							return;
+						}
+						if (event.name === 'checkout.completed') {
+							window.location.href = current.returnUrl;
+						} else if (event.name === 'checkout.closed') {
+							setBusy(false);
+						}
+					}
+				});
+				window.__zpayPaddleReady = true;
+			}
+			window.__zpayPaddlePayload = payload;
+			var checkoutOptions = {
+				transactionId: payload.transactionId,
+				settings: {
+					displayMode: 'overlay',
+					locale: payload.locale || 'en'
+				}
+			};
+			if (payload.customerEmail) {
+				checkoutOptions.customer = { email: payload.customerEmail };
+			}
+			window.Paddle.Checkout.open(checkoutOptions);
+			return;
+		}
+
 		showError('unsupported gateway: ' + gatewayName);
 		setBusy(false);
 	}
@@ -282,7 +324,9 @@
 				payerName.focus();
 				return;
 			}
-			if (gatewayName !== 'banktransfer' && params.payer_phone.replace(/[^0-9]/g, '').length < 9) {
+			var gatewayInfo = boot.gateways && boot.gateways[gatewayName] ? boot.gateways[gatewayName] : null;
+			var needsPhone = !gatewayInfo || gatewayInfo.requires_phone !== false;
+			if (gatewayName !== 'banktransfer' && needsPhone && params.payer_phone.replace(/[^0-9]/g, '').length < 9) {
 				showError(boot.msg && boot.msg.payer_phone_required ? boot.msg.payer_phone_required : 'phone required');
 				setBusy(false);
 				if (payerPhone) {

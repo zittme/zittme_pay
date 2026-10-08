@@ -17,6 +17,11 @@ use Zittme\Modules\Zittme_pay\Models\Config as ConfigModel;
 abstract class Base
 {
 	/**
+	 * 결제수단 로고를 두는 곳 (RX_BASEDIR 기준).
+	 */
+	public const LOGO_PATH = 'files/zittme_pay/logos/';
+
+	/**
 	 * 엔진에 들어 있는 드라이버. 새 PG 를 추가하면 여기에도 이름을 적는다.
 	 */
 	public static array $supported_gateways = [
@@ -27,6 +32,7 @@ abstract class Base
 		'portone',
 		'paypal',
 		'conekta',
+		'paddle',
 		'banktransfer',
 	];
 
@@ -136,6 +142,54 @@ abstract class Base
 	public function getClientScript(): string
 	{
 		return '';
+	}
+
+	/**
+	 * 결제창을 쓸 때 구매자 휴대폰 번호가 필요한가.
+	 *
+	 * 국내 PG 결제창은 휴대폰 번호를 요구한다. 해외 결제(Paddle 등)는 필요 없다.
+	 */
+	public function requiresPayerPhone(): bool
+	{
+		return true;
+	}
+
+	/**
+	 * 결제창을 열기 직전(결제 시작)에 부른다. PG 쪽 거래를 미리 만들어야 하는 드라이버가 재정의한다.
+	 *
+	 * 결제 화면을 그릴 때 부르는 buildRequest 와 달리 사용자가 결제하기를 눌렀을 때 한 번만 불린다.
+	 * 돌려주는 배열에 'pg_order_id' 가 있으면 주문의 pg_tid 로 저장되고, 'error' 가 있으면 결제를 멈춘다.
+	 *
+	 * @param object $order
+	 * @param string $state
+	 * @return array
+	 */
+	public function prepareClientPayment(object $order, string $state): array
+	{
+		return $this->buildRequest($order, $state);
+	}
+
+	/**
+	 * 서명된 웹훅을 스스로 검증·해석하는가.
+	 *
+	 * true 인 드라이버는 웹훅 주소에 gateway=이름 을 붙여 등록하고, parseWebhook 을 구현한다.
+	 */
+	public function handlesSignedWebhook(): bool
+	{
+		return false;
+	}
+
+	/**
+	 * 웹훅 서명을 검증하고 주문을 찾을 값을 꺼낸다.
+	 *
+	 * @param string $raw 요청 본문 원문
+	 * @param array $headers 소문자 헤더 이름 => 값
+	 * @return ?array 서명 불일치면 null, 무시할 이벤트면 ['ignore' => true],
+	 *                아니면 ['order_code' => ..., 'tid' => ...]
+	 */
+	public function parseWebhook(string $raw, array $headers): ?array
+	{
+		return null;
 	}
 
 	/**
@@ -289,6 +343,28 @@ abstract class Base
 			return $custom;
 		}
 		return $this->getDefaultTitle();
+	}
+
+	/**
+	 * 로고 파일 이름 형식 검사. 저장할 때 만든 이름 규칙(드라이버_무작위.확장자)만 통과한다.
+	 */
+	public static function isValidLogoName(string $file): bool
+	{
+		return (bool)preg_match('/^[a-z0-9_]+_[a-f0-9]{12}\.(png|jpg|gif|webp)$/', $file);
+	}
+
+	/**
+	 * 관리자가 올린 결제수단 로고 주소. 없으면 빈 문자열(글자로 표시).
+	 */
+	public function getLogoUrl(): string
+	{
+		$logos = ConfigModel::getConfig()->gateway_logos;
+		$file = is_array($logos) ? (string)($logos[$this->getName()] ?? '') : '';
+		if ($file === '' || !self::isValidLogoName($file) || !is_file(\RX_BASEDIR . self::LOGO_PATH . $file))
+		{
+			return '';
+		}
+		return \RX_BASEURL . self::LOGO_PATH . $file . '?t=' . filemtime(\RX_BASEDIR . self::LOGO_PATH . $file);
 	}
 
 	/**

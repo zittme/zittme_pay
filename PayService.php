@@ -460,6 +460,71 @@ class PayService
 	}
 
 	/**
+	 * PG 쪽에서 일어난 환불·차지백을 장부에 맞춘다.
+	 *
+	 * 구매자가 PG 에 직접 환불을 요청했거나 차지백이 난 경우처럼 우리 cancel() 을 거치지 않은
+	 * 취소를 웹훅으로 알게 됐을 때 쓴다. PG 가 알려 준 누적 환불액과 장부의 취소액 차이만큼
+	 * 취소를 기록하고 zittme_pay.cancelled 를 낸다. 이미 반영된 금액이면 아무것도 하지 않는다.
+	 * 돈은 이미 PG 가 돌려줬으므로 구매확정 건도 취소로 내린다.
+	 *
+	 * @param object $order
+	 * @param int $refunded_total PG 기준 누적 환불액 (주문 통화 최소 단위)
+	 * @param string $gateway
+	 * @return bool 이번 호출로 새로 반영된 금액이 있는가
+	 */
+	public static function applyGatewayRefund(object $order, int $refunded_total, string $gateway): bool
+	{
+		$fresh = Order::get((int)$order->order_srl);
+		if (!$fresh)
+		{
+			return false;
+		}
+
+		$delta = min($refunded_total, (int)$fresh->amount) - (int)$fresh->cancelled_amount;
+		if ($delta <= 0)
+		{
+			return false;
+		}
+
+		$extra = Order::mergeExtra($fresh, [
+			'cancel_history' => array_merge(
+				(array)($fresh->extra['cancel_history'] ?? []),
+				[['amount' => $delta, 'reason' => 'gateway', 'date' => date('YmdHis')]]
+			),
+		]);
+
+		if (!Order::addCancelledAmount($fresh, $delta, $extra, Order::FORCE_CANCELLABLE_STATUSES))
+		{
+			Log::fail([
+				'order_srl' => (int)$fresh->order_srl,
+				'order_code' => $fresh->order_code,
+				'gateway' => $gateway,
+				'action' => 'cancel',
+				'amount' => $delta,
+				'response_data' => 'gateway refund could not be recorded (status: ' . $fresh->status . ')',
+			]);
+			return false;
+		}
+
+		Log::add([
+			'order_srl' => (int)$fresh->order_srl,
+			'order_code' => $fresh->order_code,
+			'gateway' => $gateway,
+			'action' => 'cancel',
+			'amount' => $delta,
+			'response_data' => 'refund or chargeback reported by gateway',
+		]);
+
+		$updated = Order::get((int)$fresh->order_srl);
+		self::fireTrigger('zittme_pay.cancelled', $updated, [
+			'cancelled_amount' => $delta,
+			'manual_refund' => false,
+			'by_gateway' => true,
+		]);
+		return true;
+	}
+
+	/**
 	 * 요청자 모듈에게 결제 결과를 알린다.
 	 *
 	 * 직접 참조 대신 트리거를 쓴다. zittme_pay 는 커머스도 예약도 몰라야 한다.

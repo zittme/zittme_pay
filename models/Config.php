@@ -32,6 +32,8 @@ class Config
 		'enabled_gateways' => ['banktransfer'],
 		// 결제수단 표시 이름 (드라이버 이름 => 고객에게 보이는 이름). 비우면 언어 파일 기본값.
 		'gateway_labels' => [],
+		// 결제수단 로고 (드라이버 이름 => files/zittme_pay/logos/ 아래 파일 이름). 없으면 글자로 표시.
+		'gateway_logos' => [],
 		'toss_client_key' => '',
 		'toss_secret_key' => '',
 		// KG이니시스 (INIStdPay). 취소는 INIAPI 라 키가 따로 있다.
@@ -65,6 +67,11 @@ class Config
 		// 호스티드 결제 페이지에 열 결제수단. card / cash(OXXO) / bank_transfer(SPEI)
 		'conekta_methods' => ['card', 'cash', 'bank_transfer'],
 		'conekta_allow_krw' => 'N',
+		// Paddle Billing (해외 결제, MoR). 세 값이 모두 있어야 결제수단 목록에 나온다. sandbox / live
+		'paddle_api_key' => '',
+		'paddle_client_token' => '',
+		'paddle_webhook_secret' => '',
+		'paddle_mode' => 'sandbox',
 
 		// 공용 환율 (Currency 모델이 관리). 짓미페이와 커머스가 함께 참조한다.
 		'exchange_rates' => [],
@@ -135,7 +142,7 @@ class Config
 			}
 
 			// 배열로 쓰는 값은 문자열로 저장돼 있어도 배열로 정규화한다.
-			foreach (['enabled_gateways', 'gateway_labels', 'bank_accounts', 'exchange_rates', 'exchange_rates_manual', 'extra_currencies', 'conekta_methods'] as $key)
+			foreach (['enabled_gateways', 'gateway_labels', 'gateway_logos', 'bank_accounts', 'exchange_rates', 'exchange_rates_manual', 'extra_currencies', 'conekta_methods'] as $key)
 			{
 				if (!is_array($config->{$key}))
 				{

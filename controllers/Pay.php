@@ -91,7 +91,9 @@ class Pay extends Base
 			$gateway_info[$name] = [
 				'name' => $name,
 				'title' => $driver->getTitle(),
+				'logo' => $driver->getLogoUrl(),
 				'requires_client' => $driver->requiresClientPayment(),
+				'requires_phone' => $driver->requiresPayerPhone(),
 				'request' => $driver->buildRequest($order, $state),
 			];
 			$script = $driver->getClientScript();
@@ -182,7 +184,7 @@ class Pay extends Base
 			{
 				throw new \Zittme\Framework\Exception('zittme_pay.msg_payer_name_required');
 			}
-			if ($driver->requiresClientPayment() && strlen(preg_replace('/[^0-9]/', '', $payer_phone)) < 9)
+			if ($driver->requiresClientPayment() && $driver->requiresPayerPhone() && strlen(preg_replace('/[^0-9]/', '', $payer_phone)) < 9)
 			{
 				throw new \Zittme\Framework\Exception('zittme_pay.msg_payer_phone_required');
 			}
@@ -203,9 +205,38 @@ class Pay extends Base
 
 		if ($driver->requiresClientPayment())
 		{
+			$request = $driver->prepareClientPayment($order, $state);
+
+			// PG 쪽 거래를 미리 만든 드라이버(Paddle 등). 번호를 남겨 콜백·웹훅이 재조회하게 한다
+			if (array_key_exists('pg_order_id', $request) || !empty($request['error']))
+			{
+				Log::add([
+					'order_srl' => (int)$order->order_srl,
+					'order_code' => $order->order_code,
+					'gateway' => $gateway_name,
+					'action' => 'ready',
+					'amount' => (int)$order->amount,
+					'pg_tid' => (string)($request['pg_order_id'] ?? ''),
+					'response_data' => $request['raw'] ?? ($request['error'] ?? ''),
+					'result' => empty($request['error']) ? 'S' : 'F',
+				]);
+				if (!empty($request['error']))
+				{
+					throw new \Zittme\Framework\Exception($request['error']);
+				}
+				if ((string)$request['pg_order_id'] !== '')
+				{
+					Order::update((int)$order->order_srl, [
+						'gateway' => $driver->getName(),
+						'pg_tid' => (string)$request['pg_order_id'],
+					]);
+				}
+			}
+			unset($request['raw'], $request['pg_order_id']);
+
 			$this->add('gateway', $gateway_name);
 			$this->add('requires_client', true);
-			$this->add('request', $driver->buildRequest($order, $state));
+			$this->add('request', $request);
 			return;
 		}
 
@@ -451,6 +482,37 @@ class Pay extends Base
 		$order_code = (string)($data['orderId'] ?? $data['order_code'] ?? $data['paymentId'] ?? '');
 		$tid = (string)($data['paymentKey'] ?? $data['tid'] ?? $data['paymentId'] ?? '');
 
+		// 서명을 스스로 검증하는 드라이버(Paddle 등)는 웹훅 주소에 gateway=이름 이 붙어 온다
+		$signed_driver = null;
+		$signed_name = (string)\Context::get('gateway');
+		if ($signed_name !== '')
+		{
+			$candidate = Gateway::getDriver($signed_name);
+			if ($candidate && $candidate->handlesSignedWebhook())
+			{
+				$signed_driver = $candidate;
+				$parsed = $candidate->parseWebhook($raw, self::requestHeaders());
+				if ($parsed === null)
+				{
+					Log::fail([
+						'gateway' => $candidate->getName(),
+						'action' => 'webhook',
+						'request_data' => $raw,
+						'response_data' => 'signature verification failed',
+					]);
+					$this->add('status', 'REJECTED');
+					return;
+				}
+				if (!empty($parsed['ignore']))
+				{
+					$this->add('status', 'IGNORED');
+					return;
+				}
+				$order_code = (string)($parsed['order_code'] ?? '');
+				$tid = (string)($parsed['tid'] ?? '');
+			}
+		}
+
 		$order = Order::getByCode($order_code);
 		if (!$order)
 		{
@@ -474,6 +536,21 @@ class Pay extends Base
 				'action' => 'webhook',
 				'request_data' => $raw,
 				'response_data' => 'driver missing: ' . $order->gateway,
+			]);
+			$this->add('status', 'IGNORED');
+			return;
+		}
+
+		// 서명 검증을 거친 웹훅은 그 드라이버로 결제한 주문에만 반영한다
+		if ($signed_driver && $signed_driver->getName() !== $driver->getName())
+		{
+			Log::fail([
+				'order_srl' => (int)$order->order_srl,
+				'order_code' => $order->order_code,
+				'gateway' => $signed_driver->getName(),
+				'action' => 'webhook',
+				'request_data' => $raw,
+				'response_data' => 'gateway mismatch: ' . $order->gateway,
 			]);
 			$this->add('status', 'IGNORED');
 			return;
@@ -522,6 +599,13 @@ class Pay extends Base
 		{
 			// 이미 paid 면 markPaid 가 스스로 중복을 걸러 낸다 (로그만 남고 트리거는 나지 않는다).
 			$this->settle($order, $driver, $verified);
+		}
+		elseif (in_array($status, [Order::STATUS_CANCELLED, Order::STATUS_PARTIAL_CANCELLED], true)
+			&& array_key_exists('refunded_amount', $verified->extra))
+		{
+			// PG 가 돌려준 누적 금액을 알려 주는 드라이버(Paddle). 구매자 직접 환불·차지백도
+			// 취소 트리거까지 내보내 요청자 모듈이 라이선스 등을 회수하게 한다
+			PayService::applyGatewayRefund($order, (int)$verified->extra['refunded_amount'], $driver->getName());
 		}
 		elseif (in_array($status, [Order::STATUS_CANCELLED, Order::STATUS_PARTIAL_CANCELLED], true))
 		{
@@ -699,6 +783,24 @@ class Pay extends Base
 		}
 
 		Order::transition((int)$order->order_srl, [Order::STATUS_READY], Order::STATUS_PENDING, $fields);
+	}
+
+	/**
+	 * 요청 헤더. 이름은 소문자로 맞춘다 (서명 헤더 검증용).
+	 *
+	 * @return array
+	 */
+	protected static function requestHeaders(): array
+	{
+		$headers = [];
+		foreach ($_SERVER as $key => $value)
+		{
+			if (strpos($key, 'HTTP_') === 0 && is_string($value))
+			{
+				$headers[strtolower(str_replace('_', '-', substr($key, 5)))] = $value;
+			}
+		}
+		return $headers;
 	}
 
 	/**
