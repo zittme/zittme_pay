@@ -91,6 +91,7 @@ class Pay extends Base
 			$gateway_info[$name] = [
 				'name' => $name,
 				'title' => $driver->getTitle(),
+				'logo' => $driver->getLogoUrl(),
 				'requires_client' => $driver->requiresClientPayment(),
 				'request' => $driver->buildRequest($order, $state),
 			];

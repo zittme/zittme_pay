@@ -4,7 +4,7 @@
 	<h2>{{ $lang->zpay_tab_gateway }}</h2>
 	<p class="x_help-block">{{ $lang->about_zpay_gateway }}</p>
 
-	<form action="./" method="post" class="x_form-horizontal">
+	<form action="./" method="post" class="x_form-horizontal" enctype="multipart/form-data">
 		<input type="hidden" name="module" value="zittme_pay" />
 		<input type="hidden" name="act" value="procZittme_payAdminInsertConfig" />
 		<input type="hidden" name="tab" value="gateway" />
@@ -36,6 +36,23 @@
 				</div>
 				@endforeach
 				<p class="x_help-block">{{ $lang->zpay_gateway_label_help }}</p>
+			</div>
+		</div>
+
+		<div class="x_control-group">
+			<label class="x_control-label">{{ $lang->zpay_gateway_logo }}</label>
+			<div class="x_controls">
+				@foreach($drivers as $driver_name => $driver)
+				<div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:8px">
+					<span style="min-width:120px">{{ $driver['default_title'] ?? $driver['title'] }}</span>
+					@if(!empty($driver['logo']))
+					<span style="display:inline-flex;align-items:center;justify-content:center;height:36px;min-width:64px;padding:4px 10px;background:#fff;border:1px solid #d0d5dd;border-radius:6px;box-sizing:border-box"><img src="{{ $driver['logo'] }}" alt="{{ $driver['title'] }}" style="max-height:26px;max-width:120px;display:block" /></span>
+					<label class="x_inline"><input type="checkbox" name="gateway_logo_delete[{{ $driver_name }}]" value="Y" /> {{ $lang->zpay_gateway_logo_delete }}</label>
+					@endif
+					<input type="file" name="gateway_logo_file[{{ $driver_name }}]" accept=".png,.jpg,.jpeg,.gif,.webp,image/png,image/jpeg,image/gif,image/webp" />
+				</div>
+				@endforeach
+				<p class="x_help-block">{{ $lang->zpay_gateway_logo_help }}</p>
 			</div>
 		</div>
 

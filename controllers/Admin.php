@@ -159,6 +159,7 @@ class Admin extends Base
 				'name' => $name,
 				'title' => $driver->getTitle(),
 				'default_title' => $driver->getDefaultTitle(),
+				'logo' => $driver->getLogoUrl(),
 				'configured' => $driver->isConfigured(),
 				'enabled' => in_array($name, $config->enabled_gateways, true),
 			];
@@ -336,6 +337,11 @@ class Admin extends Base
 		foreach (self::TAB_FIELDS[$tab] as $key)
 		{
 			$config->{$key} = $this->normalizeField($key, $vars->{$key} ?? null, $config->{$key}, $vars);
+		}
+
+		if ($tab === 'gateway')
+		{
+			$config->gateway_logos = self::collectGatewayLogos(is_array($config->gateway_logos) ? $config->gateway_logos : [], $vars);
 		}
 
 		$output = ConfigModel::setConfig($config);
@@ -521,6 +527,101 @@ class Admin extends Base
 	/* ---------------------------------------------------------------------
 	 * 내부
 	 * ------------------------------------------------------------------- */
+
+	/**
+	 * 결제수단 로고 저장·삭제.
+	 *
+	 * SVG 는 스크립트를 품을 수 있어 받지 않는다. 확장자와 실제 이미지 형식(getimagesize)·MIME 이
+	 * 모두 PNG / JPEG / GIF / WEBP 로 일치해야 저장한다.
+	 *
+	 * @param array $current 드라이버 이름 => 파일 이름
+	 * @param object $vars
+	 * @return array
+	 */
+	protected static function collectGatewayLogos(array $current, object $vars): array
+	{
+		$dir = \RX_BASEDIR . Gateway::LOGO_PATH;
+		$logos = [];
+		foreach ($current as $name => $file)
+		{
+			if (in_array((string)$name, Gateway::$supported_gateways, true) && Gateway::isValidLogoName((string)$file))
+			{
+				$logos[(string)$name] = (string)$file;
+			}
+		}
+
+		$delete = is_array($vars->gateway_logo_delete ?? null) ? $vars->gateway_logo_delete : [];
+		foreach ($delete as $name => $flag)
+		{
+			if ($flag === 'Y' && isset($logos[(string)$name]))
+			{
+				\Zittme\Framework\Storage::delete($dir . $logos[(string)$name]);
+				unset($logos[(string)$name]);
+			}
+		}
+
+		$files = $_FILES['gateway_logo_file'] ?? null;
+		if (!is_array($files) || !is_array($files['name'] ?? null))
+		{
+			return $logos;
+		}
+
+		$allowed = [
+			\IMAGETYPE_PNG => ['png', ['png'], 'image/png'],
+			\IMAGETYPE_JPEG => ['jpg', ['jpg', 'jpeg'], 'image/jpeg'],
+			\IMAGETYPE_GIF => ['gif', ['gif'], 'image/gif'],
+			\IMAGETYPE_WEBP => ['webp', ['webp'], 'image/webp'],
+		];
+
+		foreach ($files['name'] as $name => $original)
+		{
+			$name = (string)$name;
+			$error = (int)($files['error'][$name] ?? \UPLOAD_ERR_NO_FILE);
+			if ($error === \UPLOAD_ERR_NO_FILE)
+			{
+				continue;
+			}
+			if (!in_array($name, Gateway::$supported_gateways, true))
+			{
+				continue;
+			}
+
+			$tmp = (string)($files['tmp_name'][$name] ?? '');
+			if ($error !== \UPLOAD_ERR_OK || $tmp === '' || !is_uploaded_file($tmp))
+			{
+				throw new Exception('zittme_pay.msg_logo_upload_failed');
+			}
+			if ((int)($files['size'][$name] ?? 0) > 1024 * 1024)
+			{
+				throw new Exception('zittme_pay.msg_logo_too_large');
+			}
+
+			$ext = strtolower(pathinfo((string)$original, \PATHINFO_EXTENSION));
+			$info = @getimagesize($tmp);
+			$type = $info ? (int)$info[2] : 0;
+			$mime = function_exists('mime_content_type') ? (string)@mime_content_type($tmp) : (string)($info['mime'] ?? '');
+			if (!isset($allowed[$type]) || !in_array($ext, $allowed[$type][1], true) || $mime !== $allowed[$type][2]
+				|| $info[0] < 1 || $info[1] < 1 || $info[0] > 2000 || $info[1] > 2000)
+			{
+				throw new Exception('zittme_pay.msg_logo_invalid_type');
+			}
+
+			\Zittme\Framework\Storage::createDirectory($dir);
+			$filename = $name . '_' . bin2hex(random_bytes(6)) . '.' . $allowed[$type][0];
+			if (!\Zittme\Framework\Storage::moveUploadedFile($tmp, $dir . $filename))
+			{
+				throw new Exception('zittme_pay.msg_logo_upload_failed');
+			}
+
+			if (isset($logos[$name]))
+			{
+				\Zittme\Framework\Storage::delete($dir . $logos[$name]);
+			}
+			$logos[$name] = $filename;
+		}
+
+		return $logos;
+	}
 
 	/**
 	 * 모든 관리자 화면이 함께 쓰는 값.

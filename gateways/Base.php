@@ -17,6 +17,11 @@ use Zittme\Modules\Zittme_pay\Models\Config as ConfigModel;
 abstract class Base
 {
 	/**
+	 * 결제수단 로고를 두는 곳 (RX_BASEDIR 기준).
+	 */
+	public const LOGO_PATH = 'files/zittme_pay/logos/';
+
+	/**
 	 * 엔진에 들어 있는 드라이버. 새 PG 를 추가하면 여기에도 이름을 적는다.
 	 */
 	public static array $supported_gateways = [
@@ -289,6 +294,28 @@ abstract class Base
 			return $custom;
 		}
 		return $this->getDefaultTitle();
+	}
+
+	/**
+	 * 로고 파일 이름 형식 검사. 저장할 때 만든 이름 규칙(드라이버_무작위.확장자)만 통과한다.
+	 */
+	public static function isValidLogoName(string $file): bool
+	{
+		return (bool)preg_match('/^[a-z0-9_]+_[a-f0-9]{12}\.(png|jpg|gif|webp)$/', $file);
+	}
+
+	/**
+	 * 관리자가 올린 결제수단 로고 주소. 없으면 빈 문자열(글자로 표시).
+	 */
+	public function getLogoUrl(): string
+	{
+		$logos = ConfigModel::getConfig()->gateway_logos;
+		$file = is_array($logos) ? (string)($logos[$this->getName()] ?? '') : '';
+		if ($file === '' || !self::isValidLogoName($file) || !is_file(\RX_BASEDIR . self::LOGO_PATH . $file))
+		{
+			return '';
+		}
+		return \RX_BASEURL . self::LOGO_PATH . $file . '?t=' . filemtime(\RX_BASEDIR . self::LOGO_PATH . $file);
 	}
 
 	/**
